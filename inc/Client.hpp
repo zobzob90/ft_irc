@@ -6,7 +6,7 @@
 /*   By: ertrigna <ertrigna@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/14 15:42:47 by ertrigna          #+#    #+#             */
-/*   Updated: 2025/11/14 16:26:02 by ertrigna         ###   ########.fr       */
+/*   Updated: 2025/11/14 16:52:59 by ertrigna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,14 +44,12 @@ class Client
 		bool		isRegistered()		const { return (_registered); }
 		
 		// SETTER
-		int			setFd();
-		std::string	setNickname();
-		std::string	setUsername();
-		std::string setRealname();
-		std::string	setHostname();
-		std::string	setBuffer();
-		bool		setAuthenticated();
-		bool		setRegistered();
+		void		setNickname(const std::string& nick);
+		void		setUsername(const std::string& user);
+		void 		setRealname(const std::string& real);
+		void		setHostname(const std::string& host);
+		bool		setAuthenticated(bool auth);
+		bool		setRegistered(bool reg);
 
 		// BUFFER MANAGEMENTS
 	

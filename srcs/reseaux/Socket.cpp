@@ -6,7 +6,7 @@
 /*   By: ertrigna <ertrigna@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/13 11:26:37 by ertrigna          #+#    #+#             */
-/*   Updated: 2025/11/14 15:02:57 by ertrigna         ###   ########.fr       */
+/*   Updated: 2025/11/14 16:39:01 by ertrigna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 void	Server::createSocket()
 {
-	_serverSocket = socket(AF_INET,SOCK_STREAM, 0); // AF_INET(domain en IPv4), SOCK_STREAM (protocole TCP le plus fiable), IPPROTO_TCP (param par defaut)
+	_serverSocket = socket(AF_INET,SOCK_STREAM, IPPROTO_TCP); // AF_INET(domain en IPv4), SOCK_STREAM (protocole TCP le plus fiable), IPPROTO_TCP (param par defaut)
 	
 	if (_serverSocket < 0)
 		throw std::runtime_error("Error: socket() failed");
