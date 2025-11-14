@@ -6,7 +6,7 @@
 /*   By: ertrigna <ertrigna@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/03 17:52:20 by ertrigna          #+#    #+#             */
-/*   Updated: 2025/11/13 14:01:00 by ertrigna         ###   ########.fr       */
+/*   Updated: 2025/11/14 15:01:07 by ertrigna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,6 +35,8 @@ class Server
 		fd_set		_readFds; // <- Fd lu
 		int			_maxFd; // <- Nombre max de Fd
 
+		void	createSocket();
+		void	configAddr();
 		void	setUpServerSocket();
 
 	public:
