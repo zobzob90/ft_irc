@@ -6,7 +6,7 @@
 /*   By: ertrigna <ertrigna@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/14 15:42:47 by ertrigna          #+#    #+#             */
-/*   Updated: 2025/11/14 16:52:59 by ertrigna         ###   ########.fr       */
+/*   Updated: 2025/11/14 17:11:49 by ertrigna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,8 +48,8 @@ class Client
 		void		setUsername(const std::string& user);
 		void 		setRealname(const std::string& real);
 		void		setHostname(const std::string& host);
-		bool		setAuthenticated(bool auth);
-		bool		setRegistered(bool reg);
+		void		setAuthenticated(bool auth);
+		void		setRegistered(bool reg);
 
 		// BUFFER MANAGEMENTS
 	
