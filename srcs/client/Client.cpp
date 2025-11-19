@@ -6,7 +6,7 @@
 /*   By: ertrigna <ertrigna@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/14 16:12:04 by ertrigna          #+#    #+#             */
-/*   Updated: 2025/11/14 17:12:19 by ertrigna         ###   ########.fr       */
+/*   Updated: 2025/11/19 17:57:19 by ertrigna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,3 +42,39 @@ void Client::setRegistered(bool reg)
 	_registered = reg;
 }
 
+bool Client::hasCompleteMessage() const
+{
+	size_t pos = _buffer.find("\r\n");
+	if (pos != std::string::npos)
+		return (true);
+	else
+		return (false);
+}
+
+void Client::clearBuffer()
+{
+	_buffer.clear();
+}
+
+void Client::appendBuffer(const std::string& data)
+{
+	_buffer = _buffer + data;
+}
+
+std::string Client::extractMessage()
+{
+	size_t pos = _buffer.find("\r\n");
+
+	if (pos == std::string::npos)
+		return ("");
+	
+	std::string message = _buffer.substr(0, pos);
+	_buffer.erase(0, pos + 2);
+
+	return (message);
+}
+
+std::string Client::getPrefix() const
+{
+	return ":" + _nickname + "!" + _username + "@" + _hostname;
+}

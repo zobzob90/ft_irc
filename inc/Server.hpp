@@ -6,7 +6,7 @@
 /*   By: ertrigna <ertrigna@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/03 17:52:20 by ertrigna          #+#    #+#             */
-/*   Updated: 2025/11/14 15:01:07 by ertrigna         ###   ########.fr       */
+/*   Updated: 2025/11/19 18:11:05 by ertrigna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,8 @@
 #include <arpa/inet.h>
 #include <sys/select.h>
 
+#include "Client.hpp"
+
 class Server
 {
 	private:
@@ -34,6 +36,7 @@ class Server
 		std::string	_password; // <- password
 		fd_set		_readFds; // <- Fd lu
 		int			_maxFd; // <- Nombre max de Fd
+		std::map<int, Client*> _clients;
 
 		void	createSocket();
 		void	configAddr();
@@ -48,14 +51,18 @@ class Server
 
 		virtual	~Server()
 		{
-			if (_serverSocket != -1)
-				close (_serverSocket);
+			for (std::map<int, Client*>::iterator it = _clients.begin(); it != _clients.end(); ++it)
+			{
+				close(it->first);
+				delete (it->second);
+			}
+			close (_serverSocket);
 		};
 		
 		void	handleNewConnection();
 		void	handleClientMessage(int fd);
 		void	removeClient(int fd);
-		void	run(); // fonction principale pour runner le serveur
+		void	run(); // fonction principale pour runner le server
 } ;
 
 #endif

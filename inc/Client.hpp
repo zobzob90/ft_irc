@@ -6,7 +6,7 @@
 /*   By: ertrigna <ertrigna@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/14 15:42:47 by ertrigna          #+#    #+#             */
-/*   Updated: 2025/11/14 17:11:49 by ertrigna         ###   ########.fr       */
+/*   Updated: 2025/11/18 14:37:56 by ertrigna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,7 +52,14 @@ class Client
 		void		setRegistered(bool reg);
 
 		// BUFFER MANAGEMENTS
-	
+		// On accumule tout les messages dans un buffer, si on trouve un \r\n on display le message
+		void		appendBuffer(const std::string& data);
+		void		clearBuffer();
+		bool		hasCompleteMessage() const;
+		std::string	extractMessage();
+
+		//UTILS
+		std::string	getPrefix() const;
 } ;
 
 #endif
