@@ -6,11 +6,12 @@
 /*   By: ertrigna <ertrigna@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/03 17:52:17 by ertrigna          #+#    #+#             */
-/*   Updated: 2025/11/19 18:09:22 by ertrigna         ###   ########.fr       */
+/*   Updated: 2025/11/21 21:13:04 by ertrigna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Server.hpp"
+#include "Command.hpp"
 
 void	Server::handleNewConnection()
 {
@@ -80,11 +81,12 @@ void	Server::handleClientMessage(int fd)
 	while (client->hasCompleteMessage())
 	{
 		std::string message = client->extractMessage();
-		std::cout << "[fd " << fd << "] " << message << std::endl;
-		//ADD PARSER ET EXECUTER CMD IRC
 
-		std::string reponse = message + "\r\n";
-		send(fd, reponse.c_str(), reponse.length(), 0);
+		if (message.empty())
+			continue ;
+		std::cout << "[fd " << fd << "] " << message << std::endl;
+		Command cmd(this, client, message);
+		cmd.execute();
 	}
 }
 

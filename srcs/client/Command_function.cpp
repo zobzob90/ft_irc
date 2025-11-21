@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Command_func.cpp                                   :+:      :+:    :+:   */
+/*   Command_function.cpp                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ertrigna <ertrigna@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/21 19:48:34 by ertrigna          #+#    #+#             */
-/*   Updated: 2025/11/21 20:40:06 by ertrigna         ###   ########.fr       */
+/*   Updated: 2025/11/21 21:17:44 by ertrigna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,7 +66,7 @@ void Command::executeNick()
 
 void Command::executeUser()
 {
-	if (_params.size() < 1)
+	if (_params.size() < 4)
 	{
 		sendError(461, "USER: Not enough parameters");
 		return ;
@@ -78,7 +78,7 @@ void Command::executeUser()
 		return ;
 	}
 
-	if (!_client->isRegistered())
+	if (_client->isRegistered())
 	{
 		sendError(462, ":Password needed");
 		return ;
@@ -95,8 +95,9 @@ void Command::executeUser()
 
 	_client->setUsername(username);
 	_client->setRealname(realname);
+	_client->setRegistered(true);
 
-	std::string welcome = ":Welcome to IRC" + _client->getPrefix();
+	std::string welcome = ":Welcome to IRC " + _client->getPrefix();
 	sendReply(1, welcome);
 }
 

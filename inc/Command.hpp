@@ -6,7 +6,7 @@
 /*   By: ertrigna <ertrigna@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/20 14:10:07 by ertrigna          #+#    #+#             */
-/*   Updated: 2025/11/20 16:42:29 by ertrigna         ###   ########.fr       */
+/*   Updated: 2025/11/21 21:00:06 by ertrigna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,7 @@
 #include <string>
 #include <vector>
 #include <sstream>
+#include <sys/socket.h>
 #include "Client.hpp"
 
 class Server;

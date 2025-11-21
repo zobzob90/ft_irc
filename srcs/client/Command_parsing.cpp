@@ -6,7 +6,7 @@
 /*   By: ertrigna <ertrigna@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/14 16:41:24 by ertrigna          #+#    #+#             */
-/*   Updated: 2025/11/21 19:57:07 by ertrigna         ###   ########.fr       */
+/*   Updated: 2025/11/21 21:16:45 by ertrigna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,37 +45,37 @@ void Command::parse(const std::string& message)
 void Command::execute()
 {
 	// Cmd pour authentification
-	if (_command == "JOIN")
-		executeJoin();
-	else if (_command == "PASS")
+	if (_command == "PASS")
 		executePass();
 	else if (_command == "USER")
 		executeUser();
+	else if (_command == "NICK")
+		executeNick();
 
 	// Cmd necessitant d'etre authentifie
-	else if (!_client->isAuthenticated() || _client->isRegistered())
+	else if (!_client->isAuthenticated() || !_client->isRegistered())
 	{
 		sendError(451, "You have not registered");
 		return ;
 	}
 	
 	// Cmd de Channel
-	else if (_command == "JOIN")
-		executeJoin();
-	else if (_command == "PART")
-		executePart();
-	else if (_command == "PRIVMSG")
-		executePrivmsg();
-	else if (_command == "INVITE")
-		executeInvite();
-	else if (_command == "TOPIC")
-		executeTopic();
-	else if (_command == "MODE")
-		executeMode();
-	else if (_command == "QUIT")
-		executeQuit();
+	// else if (_command == "JOIN")
+	// 	executeJoin();
+	// else if (_command == "PART")
+	// 	executePart();
+	// else if (_command == "PRIVMSG")
+	// 	executePrivmsg();
+	// else if (_command == "INVITE")
+	// 	executeInvite();
+	// else if (_command == "TOPIC")
+	// 	executeTopic();
+	// else if (_command == "MODE")
+	// 	executeMode();
+	// else if (_command == "QUIT")
+	// 	executeQuit();
 
-	// Cmd inconnue
-	else
-		sendError(421, _command + " :Unknow command");
+	// // Cmd inconnue
+	// else
+	// 	sendError(421, _command + " :Unknow command");
 }
