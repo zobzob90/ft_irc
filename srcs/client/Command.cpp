@@ -6,7 +6,76 @@
 /*   By: ertrigna <ertrigna@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/14 16:41:24 by ertrigna          #+#    #+#             */
-/*   Updated: 2025/11/14 16:41:25 by ertrigna         ###   ########.fr       */
+/*   Updated: 2025/11/21 18:26:40 by ertrigna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+#include "Command.hpp"
+
+void Command::parse(const std::string& message)
+{
+	std::istringstream	iss(message);
+	std::string			word;
+
+	if (iss >> _command)
+	{
+		for (size_t i = 0; i < _command.length(); ++i)
+			_command[i] = std::toupper(_command[i]);
+	}
+
+	// Extraire le parametre
+	while (iss >> word)
+	{
+		if (word[0] == ':')
+		{
+			//Extraire tout le reste de la ligne
+
+			std::string trailing = word.substr(1); // Enleve le ':'
+			std::string	rest;
+			std::getline(iss, rest);
+			if (!rest.empty())
+				trailing += rest;
+			_params.push_back(trailing);
+			break;
+		}
+		_params.push_back(word);
+	}
+}
+
+void Command::execute()
+{
+	// Cmd pour authentification
+	if (_command == "JOIN")
+		executeJoin();
+	else if (_command == "PART")
+		executePart();
+	else if (_command == "USER")
+		executeUser();
+
+	// Cmd necessitant d'etre authentifie
+	else if (!_client->isAuthenticated() || _client->isRegistered())
+	{
+		sendError(451, "You have not registered");
+		return ;
+	}
+	
+	// Cmd de Channel
+	else if (_command == "JOIN")
+		executeJoin();
+	else if (_command == "PART")
+		executePart();
+	else if (_command == "PRIVMSG")
+		executePrivmsg();
+	else if (_command == "INVITE")
+		executeInvite();
+	else if (_command == "TOPIC")
+		executeTopic();
+	else if (_command == "MODE")
+		executeMode();
+	else if (_command == "QUIT")
+		executeQuit();
+
+	// Cmd inconnue
+	else
+		sendError(421, _command + " :Unknow command");
+}
