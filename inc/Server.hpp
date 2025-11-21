@@ -6,7 +6,7 @@
 /*   By: ertrigna <ertrigna@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/03 17:52:20 by ertrigna          #+#    #+#             */
-/*   Updated: 2025/11/19 18:11:05 by ertrigna         ###   ########.fr       */
+/*   Updated: 2025/11/21 19:56:25 by ertrigna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,6 +59,9 @@ class Server
 			close (_serverSocket);
 		};
 		
+		// GETTER
+		std::string	getPassword() const {return _password; }
+
 		void	handleNewConnection();
 		void	handleClientMessage(int fd);
 		void	removeClient(int fd);

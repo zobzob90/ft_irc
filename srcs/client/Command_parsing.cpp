@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Command.cpp                                        :+:      :+:    :+:   */
+/*   Command_parsing.cpp                                :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ertrigna <ertrigna@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/14 16:41:24 by ertrigna          #+#    #+#             */
-/*   Updated: 2025/11/21 18:26:40 by ertrigna         ###   ########.fr       */
+/*   Updated: 2025/11/21 19:57:07 by ertrigna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,8 +47,8 @@ void Command::execute()
 	// Cmd pour authentification
 	if (_command == "JOIN")
 		executeJoin();
-	else if (_command == "PART")
-		executePart();
+	else if (_command == "PASS")
+		executePass();
 	else if (_command == "USER")
 		executeUser();
 
