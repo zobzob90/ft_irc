@@ -6,7 +6,7 @@
 /*   By: ertrigna <ertrigna@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/21 19:48:34 by ertrigna          #+#    #+#             */
-/*   Updated: 2025/11/21 21:17:44 by ertrigna         ###   ########.fr       */
+/*   Updated: 2025/12/02 15:40:23 by ertrigna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -110,11 +110,14 @@ void	Command::executeJoin()
 		return ;
 	}
 
-	// if (channelName[0] != "#")
-	// {
-	// 	sendError(403, channelName + " :No such channel");
-	// 	return ;
-	// }
+	std::string channelName = _params[0];
+	std::string key = (_params.size() >= 2) ? _params[1] : "";
+	
+	if (channelName[0] != '#')
+	{
+		sendError(403, channelName + " :No such channel");
+		return ;
+	}
 
 	//Recuperer ou creer le channel
 	
@@ -125,4 +128,23 @@ void	Command::executeJoin()
 	// Envoyer la liste des membres
 
 	// A faire quand on sera sur channel
+}
+
+void 	Command::executePrivmsg()
+{
+	
+}
+
+void 	Command::executeQuit()
+{
+	std::string leaveMsg = "Client Quit";
+	
+	if (_params.size() > 0)
+		leaveMsg = _params[0];
+	
+	//Broadcast aux channels ou le client est present
+	
+	//Retirer le client de tous ses channels
+	
+	// Marquer le client pour deconnexion
 }

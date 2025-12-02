@@ -6,7 +6,7 @@
 #    By: ertrigna <ertrigna@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/01/13 00:00:00 by ertrigna          #+#    #+#              #
-#    Updated: 2025/11/21 20:41:13 by ertrigna         ###   ########.fr        #
+#    Updated: 2025/12/02 16:00:02 by ertrigna         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -26,7 +26,8 @@ SRCS		= $(SRCS_DIR)/main.cpp \
 			  $(SRCS_DIR)/client/Command_parsing.cpp \
 			  $(SRCS_DIR)/client/Command_function.cpp \
 			  $(SRCS_DIR)/client/Command_utils.cpp \
-			  $(SRCS_DIR)/reseaux/Server.cpp \
+			  $(SRCS_DIR)/reseaux/Server_Management.cpp \
+			  $(SRCS_DIR)/reseaux/Channel_Management.cpp \
 			  $(SRCS_DIR)/reseaux/Socket.cpp
 
 OBJS		= $(SRCS:$(SRCS_DIR)/%.cpp=$(OBJS_DIR)/%.o)

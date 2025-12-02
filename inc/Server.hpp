@@ -6,7 +6,7 @@
 /*   By: ertrigna <ertrigna@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/03 17:52:20 by ertrigna          #+#    #+#             */
-/*   Updated: 2025/11/21 19:56:25 by ertrigna         ###   ########.fr       */
+/*   Updated: 2025/12/02 16:15:14 by ertrigna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,7 @@
 #include <sys/select.h>
 
 #include "Client.hpp"
+#include "Channel.hpp"
 
 class Server
 {
@@ -37,6 +38,7 @@ class Server
 		fd_set		_readFds; // <- Fd lu
 		int			_maxFd; // <- Nombre max de Fd
 		std::map<int, Client*> _clients;
+		std::map<std::string, Channel*> _channels; 
 
 		void	createSocket();
 		void	configAddr();
@@ -44,6 +46,7 @@ class Server
 
 	public:
 	
+		//CONSTRUCTEUR + DESTRUCTEUR
 		Server(int port, const std::string &password): _port(port), _password(password) 
 		{
 			setUpServerSocket(); // <- prepare le socket ici
@@ -62,6 +65,17 @@ class Server
 		// GETTER
 		std::string	getPassword() const {return _password; }
 
+		//CHANNEL MANAGEMENTS : Creer / Gerer / Detruire
+		Channel*	getChannel(const std::string& name);
+		Channel*	createChannel(const std::string& name, Client *creator);
+		Channel*	destroyChannel(const std::string& name);
+		
+		//CHANNEL UTILITIES
+		Channel*	broadcastToUserChannels(Client* clients, const std::string msg);
+		void		removeClientFromAllChannels(Client* client);
+		void		markForDisconnect(Client* client);
+
+		//SERVER MANAGEMENTS
 		void	handleNewConnection();
 		void	handleClientMessage(int fd);
 		void	removeClient(int fd);
