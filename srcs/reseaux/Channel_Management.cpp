@@ -14,7 +14,7 @@
 
 Channel* Server::getChannel(const std::string& name)
 {
-	
+
 }
 
 Channel* Server::createChannel(const std::string& name, Client* creator)
