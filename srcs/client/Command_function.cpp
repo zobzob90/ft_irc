@@ -119,15 +119,43 @@ void	Command::executeJoin()
 		return ;
 	}
 
-	//Recuperer ou creer le channel
+	// Recuperer ou creer le channel
+	Channel *channel = _server->getChannel(channelName);
+	if (!channel)
+		channel = _server->createChannel(channelName, _client);
 	
-	//Ajouter le client au channel
+	// Verification d'accès
+	if (channel->isInviteOnly() && !channel->isInvited(_client)){
+		sendError(473, channelName + " :Cannot join channel (+i)");
+		return;
+	}
 
-	// Envoyer la confirmation au client
+	if (channel->hasPassword() && key != channel->getPass()){
+		sendError(475, channelName + " :Cannot join channel (+k)");
+		return;
+	}
+
+	if (channel->hasUserLimit() && channel->getMembersCount() >= channel->getUserLimit()){
+		sendError(471, channelName + " :Cannot join channel (+l)");
+		return;
+	}
+	
+	// Ajouter le client au channel
+	channel->addMember(_client);
+
+	// Envoyer la confirmation à tous (y compris le client)
+	std::string joinMsg = ";" + _client->getPrefix() + " JOIN " + channelName;
+	channel->broadcast(joinMsg, NULL); //NULL = envoyer à tous
+
+	//Envoyer le topic s'il existe
+	if (!channel->getTopic().empty()){
+		sendReply(332, channelName + " :" + channel->getTopic());
+	}
 
 	// Envoyer la liste des membres
+	sendReply(353, "= " + channelName + " :" + channel->getMemberList());
+	sendReply(366, channelName + "End of /NAMES list");
 
-	// A faire quand on sera sur channel
 }
 
 void 	Command::executePrivmsg()
