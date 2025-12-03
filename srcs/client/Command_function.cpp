@@ -6,7 +6,7 @@
 /*   By: ertrigna <ertrigna@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/21 19:48:34 by ertrigna          #+#    #+#             */
-/*   Updated: 2025/12/03 15:19:55 by ertrigna         ###   ########.fr       */
+/*   Updated: 2025/12/03 15:57:32 by ertrigna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -158,10 +158,54 @@ void	Command::executeJoin()
 
 }
 
-// void 	Command::executePrivmsg()
-// {
+void 	Command::executePrivmsg()
+{
 	
-// }
+	// Verifier les paramètres (411, 412)
+	if (_params.size() < 1){
+		sendError(411, ":No recipient given (PRIVMSG)");
+		return;
+	}
+	if (_params.size() < 2){
+		sendError(412, ":No text to send");
+		return;
+	}
+
+	// Extraire target et message
+	std::string target = _params[0];
+	std::string message = _params[0];
+
+	// Accéder aux clients du serveur
+	std::map<int, Client*>& clients = _server->getClients();
+
+	// Chercher le client
+	Client* recipient = NULL;
+	for (std::map<int, Client*>::iterator it = clients.begin(); it != clients.end(); ++it){
+		if (it->second->getNickname() == target){
+			recipient = it->second;
+			break;
+		}
+	}
+
+	if (!recipient){
+		sendError(401, target + " :No such nick/channel");
+		return;
+	}
+
+	// Construire le message complet au format IRC
+
+	// Déterminer si c'est un channel ou un user
+	if (target[0] == '#'){
+		// CAS CHANNEL
+		// - Récupérer le channel (401 si inexistant)
+		// - Vérifier membership (404 si non membre)
+		// - Broadcast au channel (exclude l'expéditeur)
+	}else{
+		// CAS USER
+		// - Trouver le destinataire dans _clients (401 si inexistant)
+		// - Envoyer le message directement
+	}
+}
 
 void 	Command::executeQuit()
 {

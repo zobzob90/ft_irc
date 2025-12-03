@@ -6,7 +6,7 @@
 /*   By: ertrigna <ertrigna@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/03 17:52:20 by ertrigna          #+#    #+#             */
-/*   Updated: 2025/12/03 13:50:44 by ertrigna         ###   ########.fr       */
+/*   Updated: 2025/12/03 15:58:33 by ertrigna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,6 +63,7 @@ class Server
 		
 		// GETTER
 		std::string	getPassword() const {return _password; }
+		std::map<int, Client*>& getClients() {return _clients; }
 
 		//CHANNEL MANAGEMENTS : Creer / Gerer / Detruire
 		Channel*	getChannel(const std::string& name);
