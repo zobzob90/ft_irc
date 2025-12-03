@@ -193,7 +193,8 @@ void 	Command::executePrivmsg()
 	}
 
 	// Construire le message complet au format IRC
-
+	std::string ircMessage = _client->getPrefix() + " PRIVMSG " + target + " :" + message + "\r\n";
+	
 	// Déterminer si c'est un channel ou un user
 	if (target[0] == '#'){
 		// CAS CHANNEL
