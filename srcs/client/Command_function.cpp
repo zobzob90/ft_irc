@@ -6,7 +6,7 @@
 /*   By: ertrigna <ertrigna@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/21 19:48:34 by ertrigna          #+#    #+#             */
-/*   Updated: 2025/12/03 15:57:32 by ertrigna         ###   ########.fr       */
+/*   Updated: 2025/12/03 16:15:05 by ertrigna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,9 +52,18 @@ void Command::executeNick()
 		sendError(431, ":No Nickname Given");
 		return ;
 	}
-
-	//TODO -> Verifier doublon de Nick
-
+	
+	// Gestion doublon de Nickname
+	std::map<int, Client*>& clients = _server->getClients();
+	for (std::map<int, Client *>::iterator it = clients.begin(); it != clients.end(); ++it)
+	{
+		if (it->second != _client && it->second->getNickname() == newNickname)
+		{
+			sendError(433, newNickname + " :Nickname is already use please take another one !");
+			return ;
+		}
+	}
+	
 	_client->setNickname(newNickname);
 	if (_client->isAuthenticated() && !_client->getUsername().empty() && !_client->isRegistered())
 	{
