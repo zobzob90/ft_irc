@@ -6,7 +6,7 @@
 /*   By: ertrigna <ertrigna@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/03 17:52:20 by ertrigna          #+#    #+#             */
-/*   Updated: 2025/12/02 16:15:14 by ertrigna         ###   ########.fr       */
+/*   Updated: 2025/12/03 13:50:44 by ertrigna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,7 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
-#include <sys/select.h>
+#include <poll.h>
 
 #include "Client.hpp"
 #include "Channel.hpp"
@@ -35,8 +35,7 @@ class Server
 		int			_serverSocket; // <- socket principal
 		int			_port; // <- port
 		std::string	_password; // <- password
-		fd_set		_readFds; // <- Fd lu
-		int			_maxFd; // <- Nombre max de Fd
+		std::vector<pollfd>		_pollFds;
 		std::map<int, Client*> _clients;
 		std::map<std::string, Channel*> _channels; 
 
@@ -68,7 +67,7 @@ class Server
 		//CHANNEL MANAGEMENTS : Creer / Gerer / Detruire
 		Channel*	getChannel(const std::string& name);
 		Channel*	createChannel(const std::string& name, Client *creator);
-		Channel*	destroyChannel(const std::string& name);
+		void		destroyChannel(const std::string& name);
 		
 		//CHANNEL UTILITIES
 		Channel*	broadcastToUserChannels(Client* clients, const std::string msg);
