@@ -6,7 +6,7 @@
 /*   By: ertrigna <ertrigna@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/14 16:41:40 by ertrigna          #+#    #+#             */
-/*   Updated: 2025/12/01 19:09:56 by ertrigna         ###   ########.fr       */
+/*   Updated: 2025/12/03 14:10:09 by ertrigna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,10 +23,7 @@
 class Channel
 {
 	private:
-
-		Channel(const Channel& src) {}
-		Channel& operator=(const Channel& src) {}
-
+	
 		// ATTRIBUTS - INFO CHANNEL
 		std::string _name;
 		std::string _topic;

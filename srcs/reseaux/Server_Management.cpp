@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Server.cpp                                         :+:      :+:    :+:   */
+/*   Server_Management.cpp                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ertrigna <ertrigna@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/03 17:52:17 by ertrigna          #+#    #+#             */
-/*   Updated: 2025/11/21 21:13:04 by ertrigna         ###   ########.fr       */
+/*   Updated: 2025/12/03 14:05:57 by ertrigna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,9 +30,13 @@ void	Server::handleNewConnection()
 
 	_clients[clientFd] = newClient;
 	
-	FD_SET(clientFd, &_readFds);
-	if (clientFd > _maxFd)
-		_maxFd = clientFd;
+	pollfd p;
+	
+	p.fd = clientFd;
+	p.events = POLLIN; // POLLIN  surveille les donnees entrante a lire
+	p.revents = 0; // initialise le champ de retour a 0
+	_pollFds.push_back(p);
+	
 	std::cout << "👤 New client connected (fd=" << clientFd << ")" << std::endl;
 }
 
@@ -40,27 +44,27 @@ void	Server::removeClient(int fd)
 {
 	if (fd < 0 || fd == _serverSocket)
 		return ;
+
 	std::cout << "❌ Client disconnected (fd=" << fd << ")" << std::endl;
 
 	std::map<int, Client*>::iterator it = _clients.find(fd);
+	
 	if (it != _clients.end())
 	{
 		delete it->second;
 		_clients.erase(it);
 	}
 
-	close (fd);
-	FD_CLR(fd, &_readFds);
-
-	if (fd == _maxFd)
+	for (size_t i = 0; i < _pollFds.size(); i++)
 	{
-		_maxFd = _serverSocket;
-		for (int i = _serverSocket +1; i < fd; ++i)
+		if (_pollFds[i].fd == fd)
 		{
-			if (FD_ISSET(i, &_readFds))
-				_maxFd = i;
+			_pollFds.erase(_pollFds.begin() + i);
+			break;
 		}
 	}
+
+	close (fd);
 }
 
 void	Server::handleClientMessage(int fd)
@@ -92,25 +96,31 @@ void	Server::handleClientMessage(int fd)
 
 void	Server::run()
 {
-	FD_ZERO(&_readFds);
-	FD_SET(_serverSocket, &_readFds);
-	_maxFd = _serverSocket;
+	pollfd p;
+	p.fd = _serverSocket;
+	p.events = POLLIN;
+	p.revents = 0;
+	_pollFds.push_back(p);
 
 	while (true)
 	{
-		fd_set tmp = _readFds;
-		if (select(_maxFd + 1, &tmp, NULL, NULL, NULL) < 0)
-			throw std::runtime_error("select() failed");
+		int ret = poll(_pollFds.data(), _pollFds.size(), -1);
+		if (ret < 0)
+			throw std::runtime_error("poll() failed");
 		
-		for (int fd = 0; fd <= _maxFd; ++fd)
+		for (size_t i = 0; i < _pollFds.size(); ++i)
 		{
-			if (FD_ISSET(fd, &tmp))
+			pollfd &pfd = _pollFds[i];
+			
+			if (pfd.revents & POLLIN)
 			{
-				if (fd == _serverSocket)
+				if (pfd.fd == _serverSocket)
 					handleNewConnection();
 				else
-					handleClientMessage(fd);
+					handleClientMessage(pfd.fd);
 			}
+			if (pfd.revents & (POLLHUP | POLLERR))
+				removeClient(pfd.fd);
 		}
 	}
 }

@@ -6,7 +6,7 @@
 /*   By: ertrigna <ertrigna@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/21 19:48:34 by ertrigna          #+#    #+#             */
-/*   Updated: 2025/12/02 15:40:23 by ertrigna         ###   ########.fr       */
+/*   Updated: 2025/12/03 15:57:32 by ertrigna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,13 +74,13 @@ void Command::executeUser()
 
 	if (!_client->isAuthenticated())
 	{
-		sendError(464, ":You may not reregistered");
+		sendError(464, ":Password Incorrect !");
 		return ;
 	}
 
 	if (_client->isRegistered())
 	{
-		sendError(462, ":Password needed");
+		sendError(462, ":Password needed !");
 		return ;
 	}
 
