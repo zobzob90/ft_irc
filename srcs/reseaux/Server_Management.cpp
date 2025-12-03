@@ -6,7 +6,7 @@
 /*   By: ertrigna <ertrigna@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/03 17:52:17 by ertrigna          #+#    #+#             */
-/*   Updated: 2025/12/03 14:05:57 by ertrigna         ###   ########.fr       */
+/*   Updated: 2025/12/03 19:08:17 by ertrigna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -94,6 +94,14 @@ void	Server::handleClientMessage(int fd)
 	}
 }
 
+void	Server::serverCleanup()
+{
+	for (size_t i = 0; i < _pollFds.size(); i++)
+		close(_pollFds[i].fd);
+	_pollFds.clear();
+}
+
+
 void	Server::run()
 {
 	pollfd p;
@@ -106,7 +114,9 @@ void	Server::run()
 	{
 		int ret = poll(_pollFds.data(), _pollFds.size(), -1);
 		if (ret < 0)
+		{
 			throw std::runtime_error("poll() failed");
+		}
 		
 		for (size_t i = 0; i < _pollFds.size(); ++i)
 		{
@@ -123,4 +133,5 @@ void	Server::run()
 				removeClient(pfd.fd);
 		}
 	}
+	serverCleanup();
 }
