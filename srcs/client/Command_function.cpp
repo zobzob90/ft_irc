@@ -178,33 +178,44 @@ void 	Command::executePrivmsg()
 	// Accéder aux clients du serveur
 	std::map<int, Client*>& clients = _server->getClients();
 
-	// Chercher le client
-	Client* recipient = NULL;
-	for (std::map<int, Client*>::iterator it = clients.begin(); it != clients.end(); ++it){
-		if (it->second->getNickname() == target){
-			recipient = it->second;
-			break;
-		}
-	}
-
-	if (!recipient){
-		sendError(401, target + " :No such nick/channel");
-		return;
-	}
-
-	// Construire le message complet au format IRC
-	std::string ircMessage = _client->getPrefix() + " PRIVMSG " + target + " :" + message + "\r\n";
-	
 	// Déterminer si c'est un channel ou un user
 	if (target[0] == '#'){
 		// CAS CHANNEL
 		// - Récupérer le channel (401 si inexistant)
+		Channel* channel = _server->getChannel(target);
+		if (!channel){
+			sendError(401, target + " :No such nick/channel");
+			return;
+		}
 		// - Vérifier membership (404 si non membre)
+		if (!channel->isMember(_client)){
+			sendError(404, target + " :Cannot send to channel");
+			return;
+		}
 		// - Broadcast au channel (exclude l'expéditeur)
+		std::string ircMessage = _client->getPrefix() + " PRIVMSG " + target + " :" + message;
+		channel->broadcast(ircMessage, _client);
 	}else{
 		// CAS USER
 		// - Trouver le destinataire dans _clients (401 si inexistant)
+		std::map<int, Client*>& clients = _server->getClients();
+		Client* recipient = NULL;
+
+		for (std::map<int, Client*>::iterator it = clients.begin(); it != clients.end(); ++it){
+			if (it->second->getNickname() == target){
+				recipient = it->second;
+				break;
+			}
+		}
+
+		if (!recipient){
+			sendError(401, target + " :No such nick/channel");
+			return;
+		}
+
 		// - Envoyer le message directement
+		std::string ircMessage = _client->getPrefix() + " PRIVMSG " + target + " :" + message + "\r\n";
+		send(recipient->getFd(), ircMessage.c_str(), ircMessage.length(), 0);
 	}
 }
 
