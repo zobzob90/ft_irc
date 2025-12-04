@@ -286,3 +286,64 @@ void	Command::executePart(){
 	if (channel->getMembersCount() == 0)
 		_server->destroyChannel(channelName);
 }
+
+void	Command::executeKick(){
+	// Vérification du nombre de paramètres
+	if (_params.size() < 2){
+
+	}
+	// Extraire les paramètres
+	std::string channelName = _params[0];
+	std::string targetNick = _params[1];
+	std::string reason = "No reason given";
+
+	if (_params.size() >= 3)
+		reason = _params[2];
+
+	// Vérifier que c'est bien un channel
+	if (channelName[0] != '#'){
+		sendError(403, channelName + " :No such channel");
+		return;
+	}
+
+	// Récupérer le Channel
+	Channel* channel = _server->getChannel(channelName);
+	if (!channel){
+		sendError(403, channelName + " :Nos such channel");
+		return;
+	}
+
+	// Vérifier que l'expéditeur est membre du channel
+	if (!channel->isMember(_client)){
+		sendError(442, channelName + " :You're not on that channel");
+		return;
+	}
+
+	// Vérifier que l'expéditeur est opérateur
+	if (!channel->isOperator(_client)){
+		sendError(482, channelName + " :You're not channel operator");
+		return;
+	}
+
+	// Trouver la cible (le client a kicker)
+	std::map<int, Client*>& clients = _server->getClients();
+	Client* target = NULL;
+	for (std::map<int, Client*>::iterator it = clients.begin(); it != clients.end(); ++it){
+		if (it->second->getNickname() == targetNick){
+			target = it->second;
+			break;
+		}
+	}
+
+	// Vérifier que la cible existe
+	
+	// Vérifier que la cible est membre du channel
+
+	// Construire le message KICK au format IRC
+
+	// Broadcaster à tous les membres (y compris la cible)
+
+	// Retirer la cible du channel
+
+	// Si le channel est vide, le supprimer
+}
