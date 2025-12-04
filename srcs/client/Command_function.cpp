@@ -173,7 +173,7 @@ void 	Command::executePrivmsg()
 
 	// Extraire target et message
 	std::string target = _params[0];
-	std::string message = _params[0];
+	std::string message = _params[1];
 
 	// Accéder aux clients du serveur
 	std::map<int, Client*>& clients = _server->getClients();
@@ -225,10 +225,22 @@ void 	Command::executeQuit()
 	
 	if (_params.size() > 0)
 		leaveMsg = _params[0];
+
+	// Construire le message QUIT au format IRC
+	std::string quitMessage = _client->getPrefix() + " QUIT : " + leaveMsg;
 	
-	//Broadcast aux channels ou le client est present
+	//Broadcast aux channels où le client est present
+	std::map<std::string, Channel*>& channels = _server->getChannels();
+	for (std::map<std::string, Channel*>::iterator it = channels.begin(); it != channels.end(); ++it){
+		Channel* channel = it->second;
+		if (channel->isMember(_client)){
+			channel->broadcast(quitMessage, NULL); // Envoyer à tous (même au client qui quitte)
+		}
+	}
 	
 	//Retirer le client de tous ses channels
-	
+	_server->removeClientFromAllChannels(_client);
+
 	// Marquer le client pour deconnexion
+	_server->markForDisconnect(_client);
 }

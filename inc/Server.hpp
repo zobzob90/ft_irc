@@ -64,6 +64,7 @@ class Server
 		// GETTER
 		std::string	getPassword() const {return _password; }
 		std::map<int, Client*>& getClients() {return _clients; }
+		std::map<std::string, Channel*>& getChannels() {return _channels; }
 
 		//CHANNEL MANAGEMENTS : Creer / Gerer / Detruire
 		Channel*	getChannel(const std::string& name);
