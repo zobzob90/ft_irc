@@ -175,9 +175,6 @@ void 	Command::executePrivmsg()
 	std::string target = _params[0];
 	std::string message = _params[1];
 
-	// Accéder aux clients du serveur
-	std::map<int, Client*>& clients = _server->getClients();
-
 	// Déterminer si c'est un channel ou un user
 	if (target[0] == '#'){
 		// CAS CHANNEL
@@ -243,4 +240,49 @@ void 	Command::executeQuit()
 
 	// Marquer le client pour deconnexion
 	_server->markForDisconnect(_client);
+}
+
+void	Command::executePart(){
+	if (_params.size() < 1){
+		sendError(461, "PART :Not enough parameters");
+		return;
+	}
+
+	// Extraire le nom du channel et le message optionnel
+	std::string channelName = _params[0];
+	std::string partMessage = "Leaving"; // Message par défaut
+	if (_params.size() >= 2)
+		partMessage = _params[1];
+
+	// Vérifier que c'est bien un channel
+	if (channelName[0] != '#'){
+		sendError(403, channelName + " :No such channel");
+		return;
+	}
+
+	// Récupérer le channel
+	Channel* channel = _server->getChannel(channelName);
+	if (!channel){
+		sendError(403, channelName + " :No such channel");
+		return;
+	}
+
+	// Vérifier que le client est membre du channel
+	if (!channel->isMember(_client)){
+		sendError(442, channelName + " :You're not on that channel");
+		return;
+	}
+
+	// Construire le message PART au format IRC
+	std::string partMsg = _client->getPrefix() + " PART " + channelName + " :" + partMessage;
+
+	// Broadcaster à tous les membres (y compris celui qui part)
+	channel->broadcast(partMsg, NULL);
+
+	// Retirer le client du channel
+	channel->removeMember(_client);
+
+	// Supprimer le channel, si il est vide
+	if (channel->getMembersCount() == 0)
+		_server->destroyChannel(channelName);
 }
