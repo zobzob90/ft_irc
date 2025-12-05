@@ -6,7 +6,7 @@
 /*   By: ertrigna <ertrigna@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/21 19:48:34 by ertrigna          #+#    #+#             */
-/*   Updated: 2025/12/05 13:53:09 by ertrigna         ###   ########.fr       */
+/*   Updated: 2025/12/05 16:17:00 by ertrigna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -153,7 +153,7 @@ void	Command::executeJoin()
 	channel->addMember(_client);
 
 	// Envoyer la confirmation à tous (y compris le client)
-	std::string joinMsg = ";" + _client->getPrefix() + " JOIN " + channelName;
+	std::string joinMsg = ":" + _client->getPrefix() + " JOIN " + channelName;
 	channel->broadcast(joinMsg, NULL); //NULL = envoyer à tous
 
 	//Envoyer le topic s'il existe
@@ -163,7 +163,7 @@ void	Command::executeJoin()
 
 	// Envoyer la liste des membres
 	sendReply(353, "= " + channelName + " :" + channel->getMemberList());
-	sendReply(366, channelName + "End of /NAMES list");
+	sendReply(366, channelName + " :End of /NAMES list");
 
 }
 

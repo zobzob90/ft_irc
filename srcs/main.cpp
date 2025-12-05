@@ -6,34 +6,19 @@
 /*   By: ertrigna <ertrigna@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/03 17:53:55 by ertrigna          #+#    #+#             */
-/*   Updated: 2025/12/03 18:25:45 by ertrigna         ###   ########.fr       */
+/*   Updated: 2025/12/05 16:29:39 by ertrigna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../inc/Server.hpp"
 #include <csignal>
 
-Server* g_server = NULL;
+extern volatile sig_atomic_t g_stop;
 
-void	handle_sigint(int sig)
+void	signalHandler(int signum)
 {
-	(void)sig;
-
-	std::cout << "\n⚠️ I saw a SIGINT, time to sleep ..." << std::endl;
-	
-	if (g_server)
-	{
-		std::map<int, Client*> clients = g_server->getClients();
-		for (std::map<int, Client*>::iterator it = clients.begin(); it != clients.end(); ++it)
-		{
-			g_server->removeClient(it->first);
-		}
-		std::map<std::string, Channel*> channels = g_server->getChannels(); // ajouter un getter
-	for (std::map<std::string, Channel*>::iterator it = channels.begin(); it != channels.end(); ++it)
-			delete it->second;
-	}
-	std::cout << "Server is sleeping ..." << std::endl;
-	std::_Exit(0);
+	if (signum == SIGINT || signum == SIGQUIT)
+		g_stop = 1;
 }
 
 int main(int ac, char *av[])
@@ -53,12 +38,11 @@ int main(int ac, char *av[])
 		std::cerr << "Error: Invalid port number" << std::endl;
 		return (1);
 	}
-
+    signal(SIGINT, signalHandler);
+    signal(SIGQUIT, signalHandler);
 	try
 	{
 		Server server(port, password);
-		g_server = &server;
-		std::signal(SIGINT, handle_sigint);
 		server.run();
 	}
 	catch (const std::exception& e)

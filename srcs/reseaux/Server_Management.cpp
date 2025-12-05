@@ -6,12 +6,14 @@
 /*   By: ertrigna <ertrigna@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/03 17:52:17 by ertrigna          #+#    #+#             */
-/*   Updated: 2025/12/03 20:33:24 by ertrigna         ###   ########.fr       */
+/*   Updated: 2025/12/05 16:22:50 by ertrigna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Server.hpp"
 #include "Command.hpp"
+
+volatile sig_atomic_t g_stop = 0;
 
 void	Server::handleNewConnection()
 {
@@ -94,13 +96,41 @@ void	Server::handleClientMessage(int fd)
 	}
 }
 
-void	Server::serverCleanup()
+void	Server::signalHandler(int signum)
 {
-	for (size_t i = 0; i < _pollFds.size(); i++)
-		close(_pollFds[i].fd);
-	_pollFds.clear();
+	if (signum == SIGINT || signum == SIGQUIT)
+		g_stop = 1;
 }
 
+void	Server::closeServer()
+{
+	std::cout << "Closing server ..." << std::endl;
+
+	for (std::map<int, Client *>::iterator it = _clients.begin(); it != _clients.end(); ++it)
+	{
+		int fd = it->first;
+		Client* client = it->second;
+
+		std::string quitMsg = ":server QUIT :Server shutting down\r\n";
+		send(fd, quitMsg.c_str(), quitMsg.size(), 0);
+		close(fd);
+		delete client;
+	}
+	_clients.clear();
+
+	for (std::map<std::string, Channel *>::iterator it = _channels.begin(); it != _channels.end(); ++it)
+		delete it->second;
+	_channels.clear();
+
+	if (_serverSocket >= 0)
+	{
+		close(_serverSocket);
+		_serverSocket = -1;	
+	}
+
+	_pollFds.clear();
+	std::cout << "✅ Server closed ! Bye bye." << std::endl; 
+}
 
 void	Server::run()
 {
@@ -110,7 +140,7 @@ void	Server::run()
 	p.revents = 0;
 	_pollFds.push_back(p);
 
-	while (true)
+	while (!g_stop)
 	{
 		int ret = poll(_pollFds.data(), _pollFds.size(), -1);
 		if (ret < 0)
@@ -129,5 +159,5 @@ void	Server::run()
 				removeClient(pfd.fd);
 		}
 	}
-	serverCleanup();
+	closeServer();
 }

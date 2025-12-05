@@ -6,7 +6,7 @@
 /*   By: ertrigna <ertrigna@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/03 17:52:20 by ertrigna          #+#    #+#             */
-/*   Updated: 2025/12/05 14:13:50 by ertrigna         ###   ########.fr       */
+/*   Updated: 2025/12/05 15:56:33 by ertrigna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,7 @@
 #include <iostream>
 #include <vector>
 #include <map>
+#include <signal.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
@@ -77,6 +78,8 @@ class Server
 		void		markForDisconnect(Client* client);
 
 		//SERVER MANAGEMENTS
+		void	signalHandler(int signum);
+		void	closeServer();
 		void	handleNewConnection();
 		void	handleClientMessage(int fd);
 		void	removeClient(int fd);
