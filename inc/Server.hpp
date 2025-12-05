@@ -6,7 +6,7 @@
 /*   By: ertrigna <ertrigna@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/03 17:52:20 by ertrigna          #+#    #+#             */
-/*   Updated: 2025/12/03 19:07:11 by ertrigna         ###   ########.fr       */
+/*   Updated: 2025/12/05 14:13:50 by ertrigna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,7 +64,7 @@ class Server
 		// GETTER
 		std::string	getPassword() const {return _password; }
 		std::map<int, Client*>& getClients() {return _clients; }
-		std::map<std::string, Channel*> getChannels() const { return _channels; }
+		std::map<std::string, Channel*>& getChannels() {return _channels; }
 
 		//CHANNEL MANAGEMENTS : Creer / Gerer / Detruire
 		Channel*	getChannel(const std::string& name);
@@ -72,16 +72,15 @@ class Server
 		void		destroyChannel(const std::string& name);
 		
 		//CHANNEL UTILITIES
-		void		broadcastToUserChannels(Client* clients, const std::string msg);
+		Channel*	broadcastToUserChannels(Client* clients, const std::string msg);
 		void		removeClientFromAllChannels(Client* client);
 		void		markForDisconnect(Client* client);
 
 		//SERVER MANAGEMENTS
-		void		handleNewConnection();
-		void		serverCleanup();
-		void		handleClientMessage(int fd);
-		void		removeClient(int fd);
-		void		run(); // fonction principale pour runner le server
+		void	handleNewConnection();
+		void	handleClientMessage(int fd);
+		void	removeClient(int fd);
+		void	run(); // fonction principale pour runner le server
 } ;
 
 #endif

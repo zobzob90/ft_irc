@@ -6,7 +6,7 @@
 /*   By: ertrigna <ertrigna@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/03 17:52:17 by ertrigna          #+#    #+#             */
-/*   Updated: 2025/12/03 19:08:17 by ertrigna         ###   ########.fr       */
+/*   Updated: 2025/12/03 20:33:24 by ertrigna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -114,14 +114,10 @@ void	Server::run()
 	{
 		int ret = poll(_pollFds.data(), _pollFds.size(), -1);
 		if (ret < 0)
-		{
 			throw std::runtime_error("poll() failed");
-		}
-		
 		for (size_t i = 0; i < _pollFds.size(); ++i)
 		{
 			pollfd &pfd = _pollFds[i];
-			
 			if (pfd.revents & POLLIN)
 			{
 				if (pfd.fd == _serverSocket)
