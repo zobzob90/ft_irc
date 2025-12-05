@@ -336,14 +336,28 @@ void	Command::executeKick(){
 	}
 
 	// Vérifier que la cible existe
+	if (!target){
+		sendError(401, targetNick + " :No such nick/channel");
+		return;
+	}
 	
 	// Vérifier que la cible est membre du channel
+	if (!channel->isMember(target)){
+		sendError(441, targetNick + " " + channelName + " :They aren't on that channel");
+		return;
+	}
 
 	// Construire le message KICK au format IRC
+	std::string kickMsg = _client->getPrefix() + " KICK " + channelName + " " + targetNick + " :" + reason;
 
 	// Broadcaster à tous les membres (y compris la cible)
+	channel->broadcast(kickMsg, NULL);
 
 	// Retirer la cible du channel
+	channel->removeMember(target);
 
 	// Si le channel est vide, le supprimer
+	if (channel->getMembersCount() == 0){
+		_server->destroyChannel(channelName);
+	}
 }
