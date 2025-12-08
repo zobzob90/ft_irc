@@ -6,7 +6,7 @@
 /*   By: ertrigna <ertrigna@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/20 14:10:07 by ertrigna          #+#    #+#             */
-/*   Updated: 2025/11/21 21:00:06 by ertrigna         ###   ########.fr       */
+/*   Updated: 2025/12/08 14:24:57 by ertrigna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,12 +50,15 @@ class Command
 
 		void	sendReply(int code, const std::string& message);
 		void	sendError(int code, const std::string& message);
+
 	public:
 		Command(Server* server, Client* client, const std::string message) : _server(server), _client(client), _command(""), _params()
 		{
 			parse(message);
 		}
 		~Command() {}
+
+		
 
 		void	execute();
 };

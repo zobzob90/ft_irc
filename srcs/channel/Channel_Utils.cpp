@@ -6,7 +6,7 @@
 /*   By: ertrigna <ertrigna@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/03 16:35:14 by ertrigna          #+#    #+#             */
-/*   Updated: 2025/12/03 17:55:16 by ertrigna         ###   ########.fr       */
+/*   Updated: 2025/12/08 16:36:54 by ertrigna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 void Server::broadcastToUserChannels(Client* clients, const std::string msg)
 {
-	for (std::map<std::string, Channel*>::iterator it = _channels.begin(); it != _channels.end();)
+	for (std::map<std::string, Channel*>::iterator it = _channels.begin(); it != _channels.end(); ++it)
 	{
 		Channel* ch = it->second;
 

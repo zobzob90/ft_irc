@@ -6,7 +6,7 @@
 /*   By: ertrigna <ertrigna@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/03 17:52:20 by ertrigna          #+#    #+#             */
-/*   Updated: 2025/12/08 13:56:43 by ertrigna         ###   ########.fr       */
+/*   Updated: 2025/12/08 16:22:00 by ertrigna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,15 +52,7 @@ class Server
 			setUpServerSocket(); // <- prepare le socket ici
 		};
 
-		virtual	~Server()
-		{
-			// for (std::map<int, Client*>::iterator it = _clients.begin(); it != _clients.end(); ++it)
-			// {
-			// 	close(it->first);
-			// 	delete (it->second);
-			// }
-			// close (_serverSocket);
-		};
+		virtual	~Server(){};
 		
 		// GETTER
 		std::string	getPassword() const {return _password; }
@@ -73,16 +65,16 @@ class Server
 		void		destroyChannel(const std::string& name);
 		
 		//CHANNEL UTILITIES
-		Channel*	broadcastToUserChannels(Client* clients, const std::string msg);
+		void		broadcastToUserChannels(Client* clients, const std::string msg);
 		void		removeClientFromAllChannels(Client* client);
 		void		markForDisconnect(Client* client);
 
 		//SERVER MANAGEMENTS
-		void	signalHandler(int signum);
-		void	closeServer();
-		void	handleNewConnection();
-		void	handleClientMessage(int fd);
-		void	removeClient(int fd);
+		void	signalHandler(int signum); // fonction pour gerer les signaux
+		void	closeServer(); // fonction pour fermer le server
+		void	handleNewConnection(); // gerer la connection
+		void	handleClientMessage(int fd); // gerer les messages
+		void	removeClient(int fd); // enlever un client
 		void	run(); // fonction principale pour runner le server
 } ;
 
