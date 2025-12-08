@@ -6,7 +6,7 @@
 /*   By: ertrigna <ertrigna@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/03 17:53:55 by ertrigna          #+#    #+#             */
-/*   Updated: 2025/12/05 16:29:39 by ertrigna         ###   ########.fr       */
+/*   Updated: 2025/12/08 13:15:35 by ertrigna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,20 +29,15 @@ int main(int ac, char *av[])
 		std::cerr << "Usage: ./ircserv <port> <password>" << std::endl;
 		return (1);
 	}
-
 	int port = atoi(av[1]);
 	std::string password = av[2];
-
-	if (port <= 0 || port > 65535)
-	{
-		std::cerr << "Error: Invalid port number" << std::endl;
-		return (1);
-	}
-    signal(SIGINT, signalHandler);
-    signal(SIGQUIT, signalHandler);
 	try
 	{
+		if(port <= 1023 || port > 65535)
+			throw std::runtime_error("Error : Invalid Port Number");
 		Server server(port, password);
+		signal(SIGINT, signalHandler);
+		signal(SIGQUIT, signalHandler);
 		server.run();
 	}
 	catch (const std::exception& e)
@@ -53,10 +48,3 @@ int main(int ac, char *av[])
 	
 	return (0);
 }
-
-// int main()
-// {
-// 	Server server(6667, "password");
-// 	server.run();
-// 	return (0);
-// }

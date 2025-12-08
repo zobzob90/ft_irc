@@ -6,7 +6,7 @@
 /*   By: ertrigna <ertrigna@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/03 17:52:20 by ertrigna          #+#    #+#             */
-/*   Updated: 2025/12/05 15:56:33 by ertrigna         ###   ########.fr       */
+/*   Updated: 2025/12/08 13:56:43 by ertrigna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,12 +54,12 @@ class Server
 
 		virtual	~Server()
 		{
-			for (std::map<int, Client*>::iterator it = _clients.begin(); it != _clients.end(); ++it)
-			{
-				close(it->first);
-				delete (it->second);
-			}
-			close (_serverSocket);
+			// for (std::map<int, Client*>::iterator it = _clients.begin(); it != _clients.end(); ++it)
+			// {
+			// 	close(it->first);
+			// 	delete (it->second);
+			// }
+			// close (_serverSocket);
 		};
 		
 		// GETTER

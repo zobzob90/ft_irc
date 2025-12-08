@@ -6,7 +6,7 @@
 /*   By: ertrigna <ertrigna@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/03 17:52:17 by ertrigna          #+#    #+#             */
-/*   Updated: 2025/12/05 16:22:50 by ertrigna         ###   ########.fr       */
+/*   Updated: 2025/12/08 13:54:07 by ertrigna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,6 +48,7 @@ void	Server::removeClient(int fd)
 		return ;
 
 	std::cout << "❌ Client disconnected (fd=" << fd << ")" << std::endl;
+	close(fd);
 
 	std::map<int, Client*>::iterator it = _clients.find(fd);
 	
@@ -65,8 +66,6 @@ void	Server::removeClient(int fd)
 			break;
 		}
 	}
-
-	close (fd);
 }
 
 void	Server::handleClientMessage(int fd)
@@ -104,17 +103,14 @@ void	Server::signalHandler(int signum)
 
 void	Server::closeServer()
 {
-	std::cout << "Closing server ..." << std::endl;
+	std::cout << "\nClosing server ..." << std::endl;
 
 	for (std::map<int, Client *>::iterator it = _clients.begin(); it != _clients.end(); ++it)
 	{
-		int fd = it->first;
-		Client* client = it->second;
-
 		std::string quitMsg = ":server QUIT :Server shutting down\r\n";
-		send(fd, quitMsg.c_str(), quitMsg.size(), 0);
-		close(fd);
-		delete client;
+		send(it->first, quitMsg.c_str(), quitMsg.size(), 0);
+		close(it->first);
+		delete it->second;
 	}
 	_clients.clear();
 
@@ -143,20 +139,30 @@ void	Server::run()
 	while (!g_stop)
 	{
 		int ret = poll(_pollFds.data(), _pollFds.size(), -1);
+		
 		if (ret < 0)
-			throw std::runtime_error("poll() failed");
-		for (size_t i = 0; i < _pollFds.size(); ++i)
 		{
-			pollfd &pfd = _pollFds[i];
-			if (pfd.revents & POLLIN)
+			if (g_stop)
+				break;
+			throw std::runtime_error("poll() failed");
+		}
+		
+		size_t currentSize = _pollFds.size();
+		
+		for (size_t i = 0; i < currentSize; ++i)
+		{
+			int currentFd = _pollFds[i].fd;
+			short currentRevents = _pollFds[i].revents;
+			
+			if (currentRevents & POLLIN)
 			{
-				if (pfd.fd == _serverSocket)
+				if (currentFd == _serverSocket)
 					handleNewConnection();
 				else
-					handleClientMessage(pfd.fd);
+					handleClientMessage(currentFd);
 			}
-			if (pfd.revents & (POLLHUP | POLLERR))
-				removeClient(pfd.fd);
+			// if (currentRevents & (POLLHUP | POLLERR))
+			// 	removeClient(currentFd);
 		}
 	}
 	closeServer();
