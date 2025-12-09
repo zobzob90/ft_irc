@@ -6,12 +6,13 @@
 /*   By: ertrigna <ertrigna@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/21 19:48:34 by ertrigna          #+#    #+#             */
-/*   Updated: 2025/12/05 16:17:00 by ertrigna         ###   ########.fr       */
+/*   Updated: 2025/12/09 17:59:35 by ertrigna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Command.hpp"
 #include "Server.hpp"
+#include "Bot.hpp"
 
 // AUTHENT PART
 void	Command::executePass()
@@ -134,17 +135,20 @@ void	Command::executeJoin()
 		channel = _server->createChannel(channelName, _client);
 	
 	// Verification d'accès
-	if (channel->isInviteOnly() && !channel->isInvited(_client)){
+	if (channel->isInviteOnly() && !channel->isInvited(_client))
+	{
 		sendError(473, channelName + " :Cannot join channel (+i)");
 		return;
 	}
 
-	if (channel->hasPassword() && key != channel->getPass()){
+	if (channel->hasPassword() && key != channel->getPass())
+	{
 		sendError(475, channelName + " :Cannot join channel (+k)");
 		return;
 	}
 
-	if (channel->hasUserLimit() && channel->getMembersCount() >= channel->getUserLimit()){
+	if (channel->hasUserLimit() && channel->getMembersCount() >= channel->getUserLimit())
+	{
 		sendError(471, channelName + " :Cannot join channel (+l)");
 		return;
 	}
@@ -156,8 +160,12 @@ void	Command::executeJoin()
 	std::string joinMsg = ":" + _client->getPrefix() + " JOIN " + channelName;
 	channel->broadcast(joinMsg, NULL); //NULL = envoyer à tous
 
+	if(_server->getBot())
+		_server->getBot()->onUserJoin(channel, _client);
+
 	//Envoyer le topic s'il existe
-	if (!channel->getTopic().empty()){
+	if (!channel->getTopic().empty())
+	{
 		sendReply(332, channelName + " :" + channel->getTopic());
 	}
 
@@ -171,11 +179,13 @@ void 	Command::executePrivmsg()
 {
 	
 	// Verifier les paramètres (411, 412)
-	if (_params.size() < 1){
+	if (_params.size() < 1)
+	{
 		sendError(411, ":No recipient given (PRIVMSG)");
 		return;
 	}
-	if (_params.size() < 2){
+	if (_params.size() < 2)
+	{
 		sendError(412, ":No text to send");
 		return;
 	}
@@ -183,24 +193,29 @@ void 	Command::executePrivmsg()
 	// Extraire target et message
 	std::string target = _params[0];
 	std::string message = _params[1];
-
 	// Déterminer si c'est un channel ou un user
 	if (target[0] == '#')
 	{
 		// CAS CHANNEL
 		// - Récupérer le channel (401 si inexistant)
 		Channel* channel = _server->getChannel(target);
-		if (!channel){
+		if (!channel)
+		{
 			sendError(401, target + " :No such nick/channel");
 			return;
 		}
 		// - Vérifier membership (404 si non membre)
-		if (!channel->isMember(_client)){
+		if (!channel->isMember(_client))
+		{
 			sendError(404, target + " :Cannot send to channel");
 			return;
 		}
+        Bot* bot = _server->getBot();
+        if (bot)
+            bot->onMessage(channel, _client, message);
+
 		// - Broadcast au channel (exclude l'expéditeur)
-		std::string ircMessage = _client->getPrefix() + " PRIVMSG " + target + " :" + message;
+		std::string ircMessage = ":" + _client->getPrefix() + " PRIVMSG " + target + " :" + message;
 		channel->broadcast(ircMessage, _client);
 	}
 	else
@@ -210,14 +225,17 @@ void 	Command::executePrivmsg()
 		std::map<int, Client*>& clients = _server->getClients();
 		Client* recipient = NULL;
 
-		for (std::map<int, Client*>::iterator it = clients.begin(); it != clients.end(); ++it){
-			if (it->second->getNickname() == target){
+		for (std::map<int, Client*>::iterator it = clients.begin(); it != clients.end(); ++it)
+		{
+			if (it->second->getNickname() == target)
+			{
 				recipient = it->second;
 				break;
 			}
 		}
 
-		if (!recipient){
+		if (!recipient)
+		{
 			sendError(401, target + " :No such nick/channel");
 			return;
 		}
@@ -255,8 +273,10 @@ void 	Command::executeQuit()
 	_server->markForDisconnect(_client);
 }
 
-void	Command::executePart(){
-	if (_params.size() < 1){
+void	Command::executePart()
+{
+	if (_params.size() < 1)
+	{
 		sendError(461, "PART :Not enough parameters");
 		return;
 	}
@@ -268,20 +288,23 @@ void	Command::executePart(){
 		partMessage = _params[1];
 
 	// Vérifier que c'est bien un channel
-	if (channelName[0] != '#'){
+	if (channelName[0] != '#')
+	{
 		sendError(403, channelName + " :No such channel");
 		return;
 	}
 
 	// Récupérer le channel
 	Channel* channel = _server->getChannel(channelName);
-	if (!channel){
+	if (!channel)
+	{
 		sendError(403, channelName + " :No such channel");
 		return;
 	}
 
 	// Vérifier que le client est membre du channel
-	if (!channel->isMember(_client)){
+	if (!channel->isMember(_client))
+	{
 		sendError(442, channelName + " :You're not on that channel");
 		return;
 	}

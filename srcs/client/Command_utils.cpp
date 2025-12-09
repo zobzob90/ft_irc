@@ -6,7 +6,7 @@
 /*   By: ertrigna <ertrigna@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/21 20:40:50 by ertrigna          #+#    #+#             */
-/*   Updated: 2025/11/21 21:06:46 by ertrigna         ###   ########.fr       */
+/*   Updated: 2025/12/09 16:01:29 by ertrigna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,11 +22,12 @@ void Command::sendError(int code, const std::string& message)
 	if (_client->getNickname().empty())
 		oss << _client->getNickname() << " ";
 	else
-		oss << "*" << " ";
+		oss << "* ";
 	
-	oss << message << "\r\n";
+	oss << message;
 	std::string response = oss.str();
-	send(_client->getFd(), response.c_str(), response.length(), 0);
+	response += "\r\n";
+	_server->sendToUser(_client, response);
 }
 
 void Command::sendReply(int code, const std::string& message)
@@ -45,5 +46,7 @@ void Command::sendReply(int code, const std::string& message)
 	oss << " " << _client->getNickname() << " " << message << "\r\n";
 
 	std::string response = oss.str();
-	send(_client->getFd(), response.c_str(), response.length(), 0);
+	
+	response += "\r\n";
+	_server->sendToUser(_client, response);
 }

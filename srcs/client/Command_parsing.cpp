@@ -6,11 +6,12 @@
 /*   By: ertrigna <ertrigna@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/14 16:41:24 by ertrigna          #+#    #+#             */
-/*   Updated: 2025/12/05 16:16:09 by ertrigna         ###   ########.fr       */
+/*   Updated: 2025/12/09 17:46:51 by ertrigna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Command.hpp"
+#include <iostream>
 
 void Command::parse(const std::string& message)
 {
@@ -72,6 +73,8 @@ void Command::execute()
 	// 	executeTopic();
 	// else if (_command == "MODE")
 	// 	executeMode();
+	else if (_command == "KICK")
+		executeKick();
 	else if (_command == "QUIT")
 		executeQuit();
 

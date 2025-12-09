@@ -6,7 +6,7 @@
 /*   By: ertrigna <ertrigna@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/03 17:52:17 by ertrigna          #+#    #+#             */
-/*   Updated: 2025/12/08 13:54:07 by ertrigna         ###   ########.fr       */
+/*   Updated: 2025/12/09 17:05:24 by ertrigna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,6 +40,17 @@ void	Server::handleNewConnection()
 	_pollFds.push_back(p);
 	
 	std::cout << "👤 New client connected (fd=" << clientFd << ")" << std::endl;
+}
+
+void	Server::sendToUser(Client* user, const std::string& msg)
+{
+	if (!user)
+		return ;
+	int fd = user->getFd();
+	if (fd < 0)
+		return ;
+	std::string formattedMsg = msg + "\r\n";
+	send(fd, formattedMsg.c_str(), formattedMsg.size(), 0);
 }
 
 void	Server::removeClient(int fd)
