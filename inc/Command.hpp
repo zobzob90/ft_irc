@@ -6,7 +6,7 @@
 /*   By: ertrigna <ertrigna@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/20 14:10:07 by ertrigna          #+#    #+#             */
-/*   Updated: 2025/12/08 14:24:57 by ertrigna         ###   ########.fr       */
+/*   Updated: 2025/12/09 19:18:57 by ertrigna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,7 @@
 #include <sstream>
 #include <sys/socket.h>
 #include "Client.hpp"
+#include "Channel.hpp"
 
 class Server;
 
@@ -29,24 +30,32 @@ class Command
 		std::string _command;
 		std::vector<std::string> _params;
 
-		void	parse(const std::string& message);
+		void		parse(const std::string& message);
 		
-		// Commande pour authentification
-		void	executePass();
-		void	executeNick();
-		void	executeUser();
+		// Commande utils (factorisation)
+		Channel*	getChannelOrError(const std::string& name);
+		bool		checkChannelMembership(Channel *channel, const std::string& channelName);
+		bool		checkChannelOperator(Channel* channel, const std::string& channelName);
+		Client*		findClientByNick(const std::string& nickname);
+		void		removeFromChannelAndCleanup(Channel* channel, Client* client, const std::string& channelName);
+		bool		checkParamSize(size_t required, const std::string& cmdName);
 
+		// Commande pour authentification
+		void		executePass();
+		void		executeNick();
+		void		executeUser();
+		
 		// Commande de channel
-		void	executeJoin();
-		void	executePart();
-		void	executePrivmsg();
-		void	executeKick();
-		void	executeInvite();
-		void	executeTopic();
-		void	executeMode();
+		void		executeJoin();
+		void		executePart();
+		void		executePrivmsg();
+		void		executeKick();
+		void		executeInvite();
+		void		executeTopic();
+		void		executeMode();
 		
 		// Utils
-		void	executeQuit();
+		void		executeQuit();
 
 		void	sendReply(int code, const std::string& message);
 		void	sendError(int code, const std::string& message);
