@@ -6,7 +6,7 @@
 /*   By: ertrigna <ertrigna@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/03 17:52:17 by ertrigna          #+#    #+#             */
-/*   Updated: 2025/12/09 17:05:24 by ertrigna         ###   ########.fr       */
+/*   Updated: 2025/12/09 19:54:21 by ertrigna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,18 +82,21 @@ void	Server::removeClient(int fd)
 void	Server::handleClientMessage(int fd)
 {
 	char	buffer[512];
+	memset(buffer, 0, sizeof(buffer));
 	int		bytes = recv(fd, buffer, sizeof(buffer) - 1, 0);
 	if (bytes <= 0)
 	{
 		removeClient(fd);
 		return ;
 	}
-	buffer[bytes] = '\0';
-
-	Client* client = _clients[fd];
-	
-	client->appendBuffer(buffer);
-
+    // ✅ Vérifier que le client existe AVANT de l'utiliser
+    std::map<int, Client*>::iterator it = _clients.find(fd);
+    if (it == _clients.end())
+        return;
+    Client* client = it->second;
+    if (!client)  // ✅ Double vérification
+        return;
+    client->appendBuffer(std::string(buffer, bytes));
 	while (client->hasCompleteMessage())
 	{
 		std::string message = client->extractMessage();
@@ -103,6 +106,12 @@ void	Server::handleClientMessage(int fd)
 		std::cout << "[fd " << fd << "] " << message << std::endl;
 		Command cmd(this, client, message);
 		cmd.execute();
+		if (client->isMarkedForDisconnect())
+		{
+			std::cout << "⚠️ Client kicked by bot, disconnecting [fd " << fd << "]" << std::endl;
+			removeClient(fd);
+			return;
+		}
 	}
 }
 

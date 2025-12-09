@@ -6,7 +6,7 @@
 /*   By: ertrigna <ertrigna@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/21 19:48:34 by ertrigna          #+#    #+#             */
-/*   Updated: 2025/12/09 19:34:10 by ertrigna         ###   ########.fr       */
+/*   Updated: 2025/12/09 19:51:16 by ertrigna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -152,6 +152,11 @@ void	Command::executePrivmsg()
 			return;
 		if (_server->getBot())
 			_server->getBot()->onMessage(channel, _client, message);
+		channel = _server->getChannel(target);
+		if (!channel)
+			return ;
+		if (!channel->isMember(_client))
+			return;
 		std::string ircMessage = ":" + _client->getPrefix() + " PRIVMSG " + target + " :" + message;
 		channel->broadcast(ircMessage, _client);
 	}

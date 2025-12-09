@@ -6,7 +6,7 @@
 /*   By: ertrigna <ertrigna@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/09 14:20:40 by ertrigna          #+#    #+#             */
-/*   Updated: 2025/12/09 17:36:18 by ertrigna         ###   ########.fr       */
+/*   Updated: 2025/12/09 19:44:47 by ertrigna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,9 +60,11 @@ bool	Bot::containsBadWord(const std::string& msg) const
 void	Bot::kickUser(Channel* channel, Client* user, const std::string& reason)
 {
 	std::string msg = ":" + _name + " KICK " + channel->getName() + " " + user->getNickname() + " :" + reason;
-	
 	channel->broadcast(msg, NULL);
-	_serv->removeClient(user->getFd());
+	channel->removeMember(user);
+	if (channel->getMembersCount() == 0)
+		_serv->destroyChannel(channel->getName());
+	user->markForDisconnect();
 }
 
 void	Bot::dadJoke(Channel* channel)

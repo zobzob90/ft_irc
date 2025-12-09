@@ -6,7 +6,7 @@
 /*   By: ertrigna <ertrigna@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/14 16:41:24 by ertrigna          #+#    #+#             */
-/*   Updated: 2025/12/09 17:46:51 by ertrigna         ###   ########.fr       */
+/*   Updated: 2025/12/09 19:49:06 by ertrigna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,8 +63,8 @@ void Command::execute()
 	// Cmd de Channel
 	else if (_command == "JOIN")
 		executeJoin();
-	// else if (_command == "PART")
-	// 	executePart();
+	else if (_command == "PART")
+		executePart();
 	else if (_command == "PRIVMSG")
 		executePrivmsg();
 	// else if (_command == "INVITE")
