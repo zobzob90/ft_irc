@@ -67,10 +67,10 @@ void Command::execute()
 		executePart();
 	else if (_command == "PRIVMSG")
 		executePrivmsg();
-	// else if (_command == "INVITE")
-	// 	executeInvite();
-	// else if (_command == "TOPIC")
-	// 	executeTopic();
+	else if (_command == "INVITE")
+		executeInvite();
+	else if (_command == "TOPIC")
+		executeTopic();
 	// else if (_command == "MODE")
 	// 	executeMode();
 	else if (_command == "KICK")
