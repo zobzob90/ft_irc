@@ -126,3 +126,122 @@ void	Command::sendReply(int code, const std::string& message)
 	_server->sendToUser(_client, response);
 }
 
+// =============== MODE HELPERS ===============
+
+void Command::displayChannelModes(Channel* channel, const std::string& channelName)
+{
+	std::string modes = "+";
+	std::string params = "";
+	
+	if (channel->isInviteOnly()) 
+		modes += "i";
+	if (channel->isTopicRestricted()) 
+		modes += "t";
+	if (channel->hasPassword()) 
+	{
+		modes += "k";
+		params += " " + channel->getPass();
+	}
+	if (channel->hasUserLimit())
+	{
+		modes += "l";
+		std::ostringstream oss;
+		oss << channel->getUserLimit();
+		params += " " + oss.str();
+	}
+	
+	sendReply(324, channelName + " " + modes + params);
+}
+
+bool Command::applyModeI(Channel* channel, bool adding, std::string& applied)
+{
+	channel->setInviteOnly(adding);
+	applied += (adding ? "+" : "-");
+	applied += "i";
+	return true;
+}
+
+bool Command::applyModeT(Channel* channel, bool adding, std::string& applied)
+{
+	channel->setTopicRestricted(adding);
+	applied += (adding ? "+" : "-");
+	applied += "t";
+	return true;
+}
+
+bool Command::applyModeK(Channel* channel, bool adding, size_t& paramIdx, std::string& applied, std::string& appliedParams)
+{
+	if (adding)
+	{
+		if (paramIdx >= _params.size())
+		{
+			sendError(461, "MODE +k :Not enough parameters");
+			return false;
+		}
+		channel->setPassword(_params[paramIdx]);
+		applied += "+k";
+		appliedParams += " " + _params[paramIdx++];
+	}
+	else
+	{
+		channel->setPassword("");
+		applied += "-k";
+	}
+	return true;
+}
+
+bool Command::applyModeL(Channel* channel, bool adding, size_t& paramIdx, std::string& applied, std::string& appliedParams)
+{
+	if (adding)
+	{
+		if (paramIdx >= _params.size())
+		{
+			sendError(461, "MODE +l :Not enough parameters");
+			return false;
+		}
+		int limit = atoi(_params[paramIdx].c_str());
+		if (limit <= 0)
+		{
+			sendError(461, "MODE +l :Invalid limit");
+			return false;
+		}
+		channel->setUserLimit(limit);
+		applied += "+l";
+		appliedParams += " " + _params[paramIdx++];
+	}
+	else
+	{
+		channel->setUserLimit(0);
+		applied += "-l";
+	}
+	return true;
+}
+
+bool Command::applyModeO(Channel* channel, bool adding, size_t& paramIdx, const std::string& channelName, std::string& applied, std::string& appliedParams)
+{
+	if (paramIdx >= _params.size())
+	{
+		sendError(461, "MODE +o/-o :Not enough parameters");
+		return false;
+	}
+	
+	Client* target = findClientByNick(_params[paramIdx]);
+	if (!target)
+		return false;
+	
+	if (!channel->isMember(target))
+	{
+		sendError(441, _params[paramIdx] + " " + channelName + " :They aren't on that channel");
+		return false;
+	}
+	
+	if (adding)
+		channel->addOperator(target);
+	else
+		channel->removeOperator(target);
+	
+	applied += (adding ? "+" : "-");
+	applied += "o";
+	appliedParams += " " + _params[paramIdx++];
+	return true;
+}

@@ -40,6 +40,14 @@ class Command
 		void		removeFromChannelAndCleanup(Channel* channel, Client* client, const std::string& channelName);
 		bool		checkParamSize(size_t required, const std::string& cmdName);
 
+		// MODE helpers
+		void		displayChannelModes(Channel* channel, const std::string& channelName);
+		bool		applyModeI(Channel* channel, bool adding, std::string& applied);
+		bool		applyModeT(Channel* channel, bool adding, std::string& applied);
+		bool		applyModeK(Channel* channel, bool adding, size_t& paramIdx, std::string& applied, std::string& appliedParams);
+		bool		applyModeL(Channel* channel, bool adding, size_t& paramIdx, std::string& applied, std::string& appliedParams);
+		bool		applyModeO(Channel* channel, bool adding, size_t& paramIdx, const std::string& channelName, std::string& applied, std::string& appliedParams);
+
 		// Commande pour authentification
 		void		executePass();
 		void		executeNick();

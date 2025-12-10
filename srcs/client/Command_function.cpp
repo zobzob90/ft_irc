@@ -321,7 +321,71 @@ void		Command::executeTopic(){
 	channel->broadcast(topicMsg, NULL);
 }
 
-void		Command::executeMode(){
-	// a coder
+void	Command::executeMode()
+{
+	if (!checkParamSize(1, "MODE"))
+		return;
+	
+	std::string channelName = _params[0];
+	Channel* channel = getChannelOrError(channelName);
+	if (!channel || !checkChannelMembership(channel, channelName))
+		return;
+
+	// Afficher les modes actuels
+	if (_params.size() == 1)
+	{
+		displayChannelModes(channel, channelName);
+		return;
+	}
+
+	// Modifier les modes (OP uniquement)
+	if (!checkChannelOperator(channel, channelName))
+		return;
+
+	std::string modeStr = _params[1];
+	size_t paramIdx = 2;
+	bool adding = true;
+	std::string applied = "";
+	std::string appliedParams = "";
+
+	for (size_t i = 0; i < modeStr.length(); ++i)
+	{
+		char c = modeStr[i];
+		
+		// Gérer les modificateurs +/-
+		if (c == '+') { adding = true; continue; }
+		if (c == '-') { adding = false; continue; }
+
+		// Appliquer le mode correspondant
+		bool success = false;
+		
+		if (c == 'i')
+			success = applyModeI(channel, adding, applied);
+		else if (c == 't')
+			success = applyModeT(channel, adding, applied);
+		else if (c == 'k')
+			success = applyModeK(channel, adding, paramIdx, applied, appliedParams);
+		else if (c == 'l')
+			success = applyModeL(channel, adding, paramIdx, applied, appliedParams);
+		else if (c == 'o')
+			success = applyModeO(channel, adding, paramIdx, channelName, applied, appliedParams);
+		else
+		{
+			sendError(472, std::string(1, c) + " :is unknown mode char to me");
+			return;
+		}
+		
+		// Si une erreur s'est produite, arrêter
+		if (!success)
+			return;
+	}
+
+	// Broadcast des changements
+	if (!applied.empty())
+	{
+		std::string modeMsg = ":" + _client->getPrefix() + " MODE " + channelName + " " + applied + appliedParams;
+		channel->broadcast(modeMsg, NULL);
+	}
 }
+
 
