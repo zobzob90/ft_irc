@@ -6,7 +6,7 @@
 /*   By: ertrigna <ertrigna@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/02 16:02:08 by ertrigna          #+#    #+#             */
-/*   Updated: 2025/12/03 14:50:22 by ertrigna         ###   ########.fr       */
+/*   Updated: 2025/12/05 13:56:52 by ertrigna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,32 +44,35 @@ void Server::destroyChannel(const std::string& name)
 		std::cout << "📢 Bye Bye Channel  : " << name << std::cout;
 	}
 }
-void Server::removeClientFromAllChannels(Client* client){
+
+void Server::removeClientFromAllChannels(Client* client)
+{
 	std::map<std::string, Channel*>::iterator it = _channels.begin();
 
-	while (it != _channels.end()){
+	while (it != _channels.end())
+	{
 		Channel* channel = it->second;
-		if (channel->isMember(client)){
+		if (channel->isMember(client))
+		{
 			channel->removeMember(client);
 
 			// Si le channel est vide, on le supprime
-			if (channel->getMembersCount() == 0){
+			if (channel->getMembersCount() == 0)
+			{
 				delete it->second;
 				_channels.erase(it++); // Erase l'ancien it, puis avance
-			} else {
+			} 
+			else 
 				++it; // Avancer normalement si pas de suppression
-			}
-		} else {
+		} 
+		else
 			++it; // Avancer si le client n'est pas membre
-		}
 	}
 }
 
-void Server::markForDisconnect(Client* client){
-	// Envoyer un message ERROR au client avant de le déconnecter
+void Server::markForDisconnect(Client* client)
+{
 	std::string errorMsg = "ERROR :Closing connection\r\n";
 	send(client->getFd(), errorMsg.c_str(), errorMsg.length(), 0);
-
-	//Fermer la connexion
 	removeClient(client->getFd());
 }

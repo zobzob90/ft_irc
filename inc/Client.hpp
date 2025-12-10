@@ -6,7 +6,7 @@
 /*   By: ertrigna <ertrigna@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/14 15:42:47 by ertrigna          #+#    #+#             */
-/*   Updated: 2025/11/18 14:37:56 by ertrigna         ###   ########.fr       */
+/*   Updated: 2025/12/09 19:57:35 by ertrigna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,10 +27,11 @@ class Client
 		std::string	_buffer;	// Buffer pour messages partiels
 		bool		_authenticated;	// A-t-il envoye le bon PASS(word)
 		bool		_registered;	// A-t-il fait NICK+USER
-	
+		bool		_toDisconnect;
+		
 	public:
 		// Constructeur + Destructeur
-		Client(int fd): _fd(fd), _nickname(""), _username(""), _realname(""), _hostname(""), _buffer(""), _authenticated(false), _registered(false) {};
+		Client(int fd): _fd(fd), _nickname(""), _username(""), _realname(""), _hostname(""), _buffer(""), _authenticated(false), _registered(false), _toDisconnect(false) {};
 		~Client() {};
 
 		// GETTER
@@ -60,6 +61,8 @@ class Client
 
 		//UTILS
 		std::string	getPrefix() const;
+		bool		isMarkedForDisconnect() const {return _toDisconnect; }
+		void		markForDisconnect() { _toDisconnect = true; }
 } ;
 
 #endif

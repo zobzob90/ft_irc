@@ -6,11 +6,24 @@
 /*   By: ertrigna <ertrigna@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/13 11:26:37 by ertrigna          #+#    #+#             */
-/*   Updated: 2025/11/14 16:39:01 by ertrigna         ###   ########.fr       */
+/*   Updated: 2025/12/09 18:06:21 by ertrigna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Server.hpp"
+#include "Bot.hpp"
+
+Server::Server(int port, const std::string &password) : _port(port), _password(password), _bot(NULL)
+{
+    setUpServerSocket();
+    _bot = new Bot(this);
+}
+
+Server::~Server()
+{
+    if (_bot)
+        delete _bot;
+}
 
 void	Server::createSocket()
 {
