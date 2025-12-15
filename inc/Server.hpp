@@ -25,6 +25,7 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <poll.h>
+#include <fcntl.h>
 
 #include "Client.hpp"
 #include "Channel.hpp"

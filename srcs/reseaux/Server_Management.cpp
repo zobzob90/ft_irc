@@ -23,7 +23,14 @@ void	Server::handleNewConnection()
 	int	clientFd = accept(_serverSocket, (sockaddr *)&clientAddr, &len);
 	if (clientFd < 0)
 		return ;
-	
+
+	if (fcntl(clientFd, F_SETFL, O_NONBLOCK) < 0)
+    {
+        std::cerr << "❌ fcntl() failed on client socket" << std::endl;
+        close(clientFd);
+        return;
+    }
+
 	Client* newClient = new Client(clientFd);
 
 	char ip[INET_ADDRSTRLEN];
@@ -109,7 +116,7 @@ void	Server::handleClientMessage(int fd)
         if (message.empty())
             continue;
         
-        // Nettoyer les caractères de contrôle (important pour netcat)
+        // Nettoyer des caratère parasite
         std::string cleanMsg;
         for (size_t i = 0; i < message.length(); ++i)
         {
