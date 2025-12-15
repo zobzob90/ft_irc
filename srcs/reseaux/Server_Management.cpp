@@ -6,7 +6,7 @@
 /*   By: ertrigna <ertrigna@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/03 17:52:17 by ertrigna          #+#    #+#             */
-/*   Updated: 2025/12/09 19:54:21 by ertrigna         ###   ########.fr       */
+/*   Updated: 2025/12/15 13:39:37 by ertrigna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,12 @@ void	Server::handleNewConnection()
 	int	clientFd = accept(_serverSocket, (sockaddr *)&clientAddr, &len);
 	if (clientFd < 0)
 		return ;
+	
+	if (fcntl(clientFd, F_SETFL, O_NONBLOCK) < 0)
+	{
+		close(clientFd);
+		return ;
+	}
 	
 	Client* newClient = new Client(clientFd);
 
