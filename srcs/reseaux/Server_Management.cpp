@@ -6,7 +6,7 @@
 /*   By: ertrigna <ertrigna@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/03 17:52:17 by ertrigna          #+#    #+#             */
-/*   Updated: 2025/12/15 16:40:10 by ertrigna         ###   ########.fr       */
+/*   Updated: 2025/12/15 16:48:32 by ertrigna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -157,12 +157,6 @@ void	Server::handleClientMessage(int fd)
             return;
         }
     }
-}
-
-void	Server::signalHandler(int signum)
-{
-	if (signum == SIGINT || signum == SIGQUIT)
-		g_stop = 1;
 }
 
 void	Server::closeServer()
