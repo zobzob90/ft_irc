@@ -6,7 +6,7 @@
 /*   By: ertrigna <ertrigna@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/03 17:52:17 by ertrigna          #+#    #+#             */
-/*   Updated: 2025/12/15 16:05:20 by ertrigna         ###   ########.fr       */
+/*   Updated: 2025/12/15 16:27:08 by ertrigna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,7 +57,16 @@ void	Server::sendToUser(Client* user, const std::string& msg)
 	if (fd < 0)
 		return ;
 	std::string formattedMsg = msg + "\r\n";
-	send(fd, formattedMsg.c_str(), formattedMsg.size(), 0);
+	ssize_t sent = send(fd, formattedMsg.c_str(), formattedMsg.size(), 0);
+	if (sent < 0)
+	{
+		if (errno == EAGAIN || errno == EWOULDBLOCK)
+			return ;
+		else if (errno == EPIPE || errno == ECONNRESET)
+			return ;
+	}
+	else if (sent < (ssize_t)formattedMsg.size())
+		return ;
 }
 
 void	Server::removeClient(int fd)
