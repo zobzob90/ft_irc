@@ -81,38 +81,56 @@ void	Server::removeClient(int fd)
 
 void	Server::handleClientMessage(int fd)
 {
-	char	buffer[512];
-	memset(buffer, 0, sizeof(buffer));
-	int		bytes = recv(fd, buffer, sizeof(buffer) - 1, 0);
-	if (bytes <= 0)
-	{
-		removeClient(fd);
-		return ;
-	}
-    // ✅ Vérifier que le client existe AVANT de l'utiliser
+    char	buffer[512];
+    memset(buffer, 0, sizeof(buffer));
+    int		bytes = recv(fd, buffer, sizeof(buffer) - 1, 0);
+    
+    if (bytes <= 0)
+    {
+        removeClient(fd);
+        return ;
+    }
+    
     std::map<int, Client*>::iterator it = _clients.find(fd);
     if (it == _clients.end())
         return;
     Client* client = it->second;
-    if (!client)  // ✅ Double vérification
+    if (!client)
         return;
+    
+    // Ajouter au buffer du client
     client->appendBuffer(std::string(buffer, bytes));
-	while (client->hasCompleteMessage())
-	{
-		std::string message = client->extractMessage();
-
-		if (message.empty())
-			continue ;
-		std::cout << "[fd " << fd << "] " << message << std::endl;
-		Command cmd(this, client, message);
-		cmd.execute();
-		if (client->isMarkedForDisconnect())
-		{
-			std::cout << "⚠️ Client kicked by bot, disconnecting [fd " << fd << "]" << std::endl;
-			removeClient(fd);
-			return;
-		}
-	}
+    
+    // Traiter tous les messages complets
+    while (client->hasCompleteMessage())
+    {
+        std::string message = client->extractMessage();
+        
+        if (message.empty())
+            continue;
+        
+        // Nettoyer les caractères de contrôle (important pour netcat)
+        std::string cleanMsg;
+        for (size_t i = 0; i < message.length(); ++i)
+        {
+            if (message[i] != '\r' && message[i] != '\n' && message[i] >= 32)
+                cleanMsg += message[i];
+        }
+        
+        if (cleanMsg.empty())
+            continue;
+        
+        std::cout << "[fd " << fd << "] " << cleanMsg << std::endl;
+        Command cmd(this, client, cleanMsg);
+        cmd.execute();
+        
+        if (client->isMarkedForDisconnect())
+        {
+            std::cout << "⚠️ Client kicked by bot, disconnecting [fd " << fd << "]" << std::endl;
+            removeClient(fd);
+            return;
+        }
+    }
 }
 
 void	Server::signalHandler(int signum)

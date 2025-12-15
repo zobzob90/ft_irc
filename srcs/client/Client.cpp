@@ -42,15 +42,6 @@ void Client::setRegistered(bool reg)
 	_registered = reg;
 }
 
-bool Client::hasCompleteMessage() const
-{
-	size_t pos = _buffer.find("\r\n");
-	if (pos != std::string::npos)
-		return (true);
-	else
-		return (false);
-}
-
 void Client::clearBuffer()
 {
 	_buffer.clear();
@@ -63,15 +54,35 @@ void Client::appendBuffer(const std::string& data)
 
 std::string Client::extractMessage()
 {
-	size_t pos = _buffer.find("\r\n");
+    // Chercher \r\n (standard IRC)
+    size_t pos = _buffer.find("\r\n");
+    
+    // Si pas trouvé, chercher juste \n (netcat)
+    if (pos == std::string::npos)
+        pos = _buffer.find("\n");
+    
+    if (pos == std::string::npos)
+        return ("");
+    
+    std::string message = _buffer.substr(0, pos);
+    
+    // Effacer le message + le délimiteur
+    if (_buffer[pos] == '\r' && pos + 1 < _buffer.size() && _buffer[pos + 1] == '\n')
+        _buffer.erase(0, pos + 2);  // \r\n
+    else
+        _buffer.erase(0, pos + 1);  // \n seul
+    
+    return (message);
+}
 
-	if (pos == std::string::npos)
-		return ("");
-	
-	std::string message = _buffer.substr(0, pos);
-	_buffer.erase(0, pos + 2);
-
-	return (message);
+bool Client::hasCompleteMessage() const
+{
+    // Accepter soit \r\n (standard) soit \n seul (netcat)
+    if (_buffer.find("\r\n") != std::string::npos)
+        return (true);
+    if (_buffer.find("\n") != std::string::npos)
+        return (true);
+    return (false);
 }
 
 std::string Client::getPrefix() const
