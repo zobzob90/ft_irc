@@ -122,6 +122,11 @@ void	Command::executeJoin()
 	}
 	// Ajouter le client au channel
 	channel->addMember(_client);
+	
+	// Si le client avait une invitation, la retirer (elle a été utilisée)
+	if (channel->isInvited(_client))
+		channel->removeInvite(_client);
+	
 	// Envoyer la confirmation à tous (y compris le client)
 	std::string joinMsg = ":" + _client->getPrefix() + " JOIN " + channelName;
 	channel->broadcast(joinMsg, NULL); //NULL = envoyer à tous
@@ -229,3 +234,160 @@ void	Command::executeKick()
 	channel->broadcast(kickMsg, NULL);
 	removeFromChannelAndCleanup(channel, target, channelName);
 }
+
+void	Command::executeInvite()
+{
+	// Vérifier les paramètres : INVITE <nickname> <channel>
+	if (!checkParamSize(2, "INVITE"))
+		return;
+	
+	std::string targetNick = _params[0];
+	std::string channelName = _params[1];
+
+	// Vérifier que le channel existe et commence par #
+	Channel* channel = getChannelOrError(channelName);
+	if (!channel)
+		return;
+
+	// Vérifier que l'inviteur est membre du channel
+	if (!checkChannelMembership(channel, channelName))
+		return;
+
+	// Si le channel est en mode +i (invite-only), seuls les OPs peuvent inviter
+	if (channel->isInviteOnly() && !checkChannelOperator(channel, channelName))
+		return;
+
+	// Trouver l'utilisateur cible
+	Client* target = findClientByNick(targetNick);
+	if (!target)
+		return;
+
+	// Vérifier que la cible n'est pas déjà sur le channel
+	if (channel->isMember(target)){
+		sendError(443, targetNick + " " + channelName + " :is already on channel");
+		return;
+	}
+
+	// Ajouter l'invitation
+	channel->addInvite(target);
+
+	// Envoyer la notification à la cible
+	std::string inviteMsg = ":" + _client->getPrefix() + " INVITE " + targetNick + " " + channelName;
+	_server->sendToUser(target, inviteMsg);
+
+	// Confirmer à l'inviteur (code 341)
+	sendReply(341, targetNick + " " + channelName);
+}
+
+void		Command::executeTopic(){
+	// Vérifier qu'on a au moins le nom du channel
+	if (!checkParamSize(1, "TOPIC"))
+		return;
+	std::string channelName = _params[0];
+
+	// Vérifier que le channel existe et commence par #
+	Channel* channel = getChannelOrError(channelName);
+	if (!channel)
+		return;
+
+	// Vérifier que le client est membre du channel
+	if (!checkChannelMembership(channel, channelName))
+		return;
+	
+	// CAS 1 : Afficher le tropic actuel (pas de 2ème paramètre)
+	if (_params.size() == 1){
+		std::string currentTopic = channel->getTopic();
+
+		if (currentTopic.empty()){
+			sendReply(331, channelName + " :No topic is set");
+		} else {
+			sendReply(332, channelName + " :" + currentTopic);
+		}
+		return;
+	}
+
+	// CAS 2 : Modifier le topic (_params.size() >= 2)
+	std::string newTopic = _params[1];
+
+	// Si le channel a le mode +t (topicRestrict), seuls les OPs peuvent changer
+	if (channel->isTopicRestricted() && !checkChannelOperator(channel, channelName))
+		return;
+	
+	// Changer le topic
+	channel->setTopic(newTopic);
+
+	// Notifier tous les membres du channel du changement de topic
+	std::string topicMsg = ":" + _client->getPrefix() + " TOPIC " + channelName + " : " + newTopic;
+	channel->broadcast(topicMsg, NULL);
+}
+
+void	Command::executeMode()
+{
+	if (!checkParamSize(1, "MODE"))
+		return;
+	
+	std::string channelName = _params[0];
+	Channel* channel = getChannelOrError(channelName);
+	if (!channel || !checkChannelMembership(channel, channelName))
+		return;
+
+	// Afficher les modes actuels
+	if (_params.size() == 1)
+	{
+		displayChannelModes(channel, channelName);
+		return;
+	}
+
+	// Modifier les modes (OP uniquement)
+	if (!checkChannelOperator(channel, channelName))
+		return;
+
+	std::string modeStr = _params[1];
+	size_t paramIdx = 2;
+	bool adding = true;
+	std::string applied = "";
+	std::string appliedParams = "";
+
+	for (size_t i = 0; i < modeStr.length(); ++i)
+	{
+		char c = modeStr[i];
+		
+		// Gérer les modificateurs +/-
+		if (c == '+') { adding = true; continue; }
+		if (c == '-') { adding = false; continue; }
+
+		// Appliquer le mode correspondant
+		bool success = false;
+		
+		if (c == 'i')
+			success = applyModeI(channel, adding, applied);
+		else if (c == 't')
+			success = applyModeT(channel, adding, applied);
+		else if (c == 'k')
+			success = applyModeK(channel, adding, paramIdx, applied, appliedParams);
+		else if (c == 'l')
+			success = applyModeL(channel, adding, paramIdx, applied, appliedParams);
+		else if (c == 'o')
+			success = applyModeO(channel, adding, paramIdx, channelName, applied, appliedParams);
+		else
+		{
+			sendError(472, std::string(1, c) + " :is unknown mode char to me");
+			return;
+		}
+		
+		// Si une erreur s'est produite, arrêter
+		if (!success)
+			return;
+	}
+
+	// Broadcast des changements
+	if (!applied.empty())
+	{
+		std::string modeMsg = ":" + _client->getPrefix() + " MODE " + channelName + " " + applied + appliedParams;
+		channel->broadcast(modeMsg, NULL);
+	}
+}
+
+//je suis un commmentaire
+
+
