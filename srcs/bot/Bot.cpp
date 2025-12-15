@@ -59,7 +59,7 @@ bool	Bot::containsBadWord(const std::string& msg) const
 
 void	Bot::kickUser(Channel* channel, Client* user, const std::string& reason)
 {
-	std::string msg = ":" + _name + " KICK " + channel->getName() + " " + user->getNickname() + " :" + reason;
+	std::string msg = ":" + _name + " KICK " + channel->getName() + " " + user->getNickname() + " :" + reason + "\r\n";
 	channel->broadcast(msg, NULL);
 	channel->removeMember(user);
 	if (channel->getMembersCount() == 0)
