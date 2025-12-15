@@ -6,7 +6,7 @@
 /*   By: ertrigna <ertrigna@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/03 17:53:55 by ertrigna          #+#    #+#             */
-/*   Updated: 2025/12/15 15:01:57 by ertrigna         ###   ########.fr       */
+/*   Updated: 2025/12/15 15:52:47 by ertrigna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,9 +17,20 @@ extern volatile sig_atomic_t g_stop;
 
 void	signalHandler(int signum)
 {
-	if (signum == SIGINT || signum == SIGQUIT)
+	if (signum == SIGINT)
+	{
+		std::cout << "\n\033[1;33m⚠️  Received SIGINT (Ctrl+C), shutting down...\033[0m" << std::endl;
 		g_stop = 1;
+	}
+	else if (signum == SIGQUIT)
+	{
+		std::cout << "\n\033[1;33m⚠️  Received SIGQUIT (Ctrl+\\), shutting down...\033[0m" << std::endl;
+        g_stop = 1;
+	}
+	else if (signum == SIGTSTP)
+		std::cout << "\n\033[1;31m❌ SIGTSTP (Ctrl+Z) is disabled for this server.\033[0m" << std::endl;
 }
+
 
 void	printTitle(int port, const std::string &pass)
 {
@@ -71,6 +82,7 @@ int main(int ac, char *av[])
 		Server server(port, password);
 		signal(SIGINT, signalHandler);
 		signal(SIGQUIT, signalHandler);
+		signal(SIGTSTP, signalHandler);
 		server.run();
 	}
 	catch (const std::exception& e)

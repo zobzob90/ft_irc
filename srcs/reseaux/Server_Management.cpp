@@ -6,12 +6,13 @@
 /*   By: ertrigna <ertrigna@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/03 17:52:17 by ertrigna          #+#    #+#             */
-/*   Updated: 2025/12/15 13:39:37 by ertrigna         ###   ########.fr       */
+/*   Updated: 2025/12/15 16:05:20 by ertrigna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Server.hpp"
 #include "Command.hpp"
+#include "Bot.hpp"
 
 volatile sig_atomic_t g_stop = 0;
 
@@ -147,7 +148,10 @@ void	Server::signalHandler(int signum)
 
 void	Server::closeServer()
 {
-	std::cout << "\nClosing server ..." << std::endl;
+	if (_serverSocket < 0)
+		return;
+		
+	std::cout << "\n\033[1;33m🔌 Closing server...\033[0m" << std::endl;
 
 	for (std::map<int, Client *>::iterator it = _clients.begin(); it != _clients.end(); ++it)
 	{
@@ -162,6 +166,12 @@ void	Server::closeServer()
 		delete it->second;
 	_channels.clear();
 
+	if (_bot)
+	{
+		delete _bot;
+		_bot = NULL;
+	}
+
 	if (_serverSocket >= 0)
 	{
 		close(_serverSocket);
@@ -169,7 +179,7 @@ void	Server::closeServer()
 	}
 
 	_pollFds.clear();
-	std::cout << "✅ Server closed ! Bye bye." << std::endl; 
+	std::cout << "\033[1;32m✅ Server closed! Goodbye!\033[0m" << std::endl;
 }
 
 void	Server::run()
@@ -186,6 +196,8 @@ void	Server::run()
 		
 		if (ret < 0)
 		{
+			if (errno == EINTR)
+				continue;
 			if (g_stop)
 				break;
 			throw std::runtime_error("poll() failed");
@@ -205,8 +217,6 @@ void	Server::run()
 				else
 					handleClientMessage(currentFd);
 			}
-			// if (currentRevents & (POLLHUP | POLLERR))
-			// 	removeClient(currentFd);
 		}
 	}
 	closeServer();
