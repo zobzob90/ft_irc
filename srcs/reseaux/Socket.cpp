@@ -6,7 +6,7 @@
 /*   By: ertrigna <ertrigna@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/13 11:26:37 by ertrigna          #+#    #+#             */
-/*   Updated: 2025/12/15 14:01:47 by ertrigna         ###   ########.fr       */
+/*   Updated: 2025/12/15 15:12:36 by ertrigna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,5 +55,5 @@ void	Server::setUpServerSocket()
 {
 	createSocket();
 	configAddr();
-	std::cout << "✅ Server listening on port " << _port << std::endl;
+	std::cout << "\033[1;32m✅ Server listening on port \033[1;37m" << _port << " \033[1;32m⚡ ONLINE\033[0m" << std::endl;
 }
