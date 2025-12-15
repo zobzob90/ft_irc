@@ -6,7 +6,7 @@
 /*   By: ertrigna <ertrigna@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/03 17:52:17 by ertrigna          #+#    #+#             */
-/*   Updated: 2025/12/15 16:48:32 by ertrigna         ###   ########.fr       */
+/*   Updated: 2025/12/15 17:49:57 by ertrigna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 #include "Command.hpp"
 #include "Bot.hpp"
 
-volatile sig_atomic_t g_stop = 0;
+extern volatile sig_atomic_t g_stop;
 
 void	Server::handleNewConnection()
 {

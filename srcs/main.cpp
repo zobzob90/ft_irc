@@ -6,14 +6,14 @@
 /*   By: ertrigna <ertrigna@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/03 17:53:55 by ertrigna          #+#    #+#             */
-/*   Updated: 2025/12/15 15:52:47 by ertrigna         ###   ########.fr       */
+/*   Updated: 2025/12/15 17:00:54 by ertrigna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../inc/Server.hpp"
 #include <csignal>
 
-extern volatile sig_atomic_t g_stop;
+volatile sig_atomic_t g_stop;
 
 void	signalHandler(int signum)
 {
