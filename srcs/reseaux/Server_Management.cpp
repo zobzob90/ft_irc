@@ -6,7 +6,7 @@
 /*   By: ertrigna <ertrigna@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/03 17:52:17 by ertrigna          #+#    #+#             */
-/*   Updated: 2025/12/15 16:27:08 by ertrigna         ###   ########.fr       */
+/*   Updated: 2025/12/15 16:40:10 by ertrigna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -120,6 +120,12 @@ void	Server::handleClientMessage(int fd)
     // Traiter tous les messages complets
     while (client->hasCompleteMessage())
     {
+		it = _clients.find(fd);
+		if (it == _clients.end())
+			return ;
+		client = it->second;
+		if (!client)
+			return;
         std::string message = client->extractMessage();
         
         if (message.empty())
@@ -139,7 +145,11 @@ void	Server::handleClientMessage(int fd)
         std::cout << "[fd " << fd << "] " << cleanMsg << std::endl;
         Command cmd(this, client, cleanMsg);
         cmd.execute();
-        
+		
+		it = _clients.find(fd);
+        if (it == _clients.end())
+			return ;
+			
         if (client->isMarkedForDisconnect())
         {
             std::cout << "⚠️ Client kicked by bot, disconnecting [fd " << fd << "]" << std::endl;
