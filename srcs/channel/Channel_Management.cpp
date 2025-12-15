@@ -41,7 +41,7 @@ void Server::destroyChannel(const std::string& name)
 	{
 		delete it->second;
 		_channels.erase(it);
-		std::cout << "📢 Bye Bye Channel  : " << name << std::cout;
+		std::cout << "📢 Bye Bye Channel  : " << name << std::endl;
 	}
 }
 

@@ -50,7 +50,9 @@ Server::Server(int port, const std::string &password) : _port(port), _password(p
         throw std::runtime_error("❌ listen() failed");
     }
 
+    _bot = new Bot(this);
     std::cout << "✅ Server started on port " << _port << std::endl;
+    std::cout << "🤖 Bot activated: " << _bot->getName() << std::endl;
 }
 
 Server::~Server()

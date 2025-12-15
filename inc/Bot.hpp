@@ -37,6 +37,7 @@ class Bot
 			_botClient->setNickname(_name);
 			_botClient->setUsername(_name);
 			_botClient->setRealname("IRC ROBOCOP");
+			_botClient->setHostname("server");
 
 			_bannedWords.push_back("pute");
 			_bannedWords.push_back("connard");

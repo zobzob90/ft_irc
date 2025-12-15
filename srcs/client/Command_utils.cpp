@@ -101,7 +101,6 @@ void	Command::sendError(int code, const std::string& message)
 		oss << "* ";
 	oss << message;
 	std::string response = oss.str();
-	response += "\r\n";
 	_server->sendToUser(_client, response);
 }
 
@@ -118,11 +117,10 @@ void	Command::sendReply(int code, const std::string& message)
 	else
 		oss << code;
 	
-	oss << " " << _client->getNickname() << " " << message << "\r\n";
+	oss << " " << _client->getNickname() << " " << message;
 
 	std::string response = oss.str();
 	
-	response += "\r\n";
 	_server->sendToUser(_client, response);
 }
 

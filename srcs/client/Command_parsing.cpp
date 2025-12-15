@@ -80,5 +80,5 @@ void Command::execute()
 
 	// // Cmd inconnue
 	else
-		sendError(421, _command + " :Unknow command");
+		sendError(421, _command + " :Unknown command");
 }

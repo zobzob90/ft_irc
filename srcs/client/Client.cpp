@@ -87,5 +87,5 @@ bool Client::hasCompleteMessage() const
 
 std::string Client::getPrefix() const
 {
-	return ":" + _nickname + "!" + _username + "@" + _hostname;
+	return _nickname + "!" + _username + "@" + _hostname;
 }
