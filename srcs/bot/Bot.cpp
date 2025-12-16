@@ -15,12 +15,33 @@
 
 void	Bot::onUserJoin(Channel *channel, Client* user)
 {
+	// Protection contre les pointeurs NULL
+	if (!channel || !user)
+	{
+		std::cerr << "ERROR: Bot::onUserJoin - NULL pointer!" << std::endl;
+		return;
+	}
+	
+	// Protection contre les channels invalides
+	if (channel->getName().empty() || channel->getName().length() < 2)
+	{
+		std::cerr << "ERROR: Bot::onUserJoin - Invalid channel name: " << channel->getName() << std::endl;
+		return;
+	}
+	
 	std::string msg = "Welcome " + user->getNickname() + "! Respecte mon autorite 👮";
 	sendToChannel(channel, msg);
 }
 
 void	Bot::sendToChannel(Channel* channel, const std::string& msg)
 {
+	// Protection contre les pointeurs NULL
+	if (!channel)
+	{
+		std::cerr << "ERROR: Bot::sendToChannel - NULL channel!" << std::endl;
+		return;
+	}
+	
 	std::string formattedMsg = ":" + _botClient->getPrefix() + " PRIVMSG " + channel->getName() + " :" + msg;
 	channel->broadcast(formattedMsg, NULL);
 }
@@ -33,6 +54,13 @@ void	Bot::sendToUser(Client* user, const std::string& reason)
 
 void	Bot::onMessage(Channel* channel, Client* user, const std::string& msg)
 {
+	// Protection contre les pointeurs NULL
+	if (!channel || !user)
+	{
+		std::cerr << "ERROR: Bot::onMessage - NULL pointer!" << std::endl;
+		return;
+	}
+	
 	if (containsBadWord(msg))
 	{
 		kickUser(channel, user, "Gros mots interdit 👮");
@@ -59,12 +87,21 @@ bool	Bot::containsBadWord(const std::string& msg) const
 
 void	Bot::kickUser(Channel* channel, Client* user, const std::string& reason)
 {
-	std::string msg = ":" + _botClient->getPrefix() + " KICK " + channel->getName() + " " + user->getNickname() + " :" + reason;
+	// IMPORTANT: Sauvegarder le nom avant de manipuler le channel
+	std::string channelName = channel->getName();
+	std::string msg = ":" + _botClient->getPrefix() + " KICK " + channelName + " " + user->getNickname() + " :" + reason;
+	
 	channel->broadcast(msg, NULL);
-	std::cout << "🚨 " << _name << " kicked " << user->getNickname() << " from " << channel->getName() << ": " << reason << std::endl;
+	std::cout << "🚨 " << _name << " kicked " << user->getNickname() << " from " << channelName << ": " << reason << std::endl;
+	
 	channel->removeMember(user);
+	
+	// Vérifier si le channel est vide APRÈS avoir fini de l'utiliser
 	if (channel->getMembersCount() == 0)
-		_serv->destroyChannel(channel->getName());
+	{
+		// Ne plus utiliser le pointeur channel après cette ligne !
+		_serv->destroyChannel(channelName);
+	}
 	// Ne pas déconnecter l'utilisateur, juste le retirer du channel
 }
 

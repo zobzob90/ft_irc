@@ -71,8 +71,8 @@ void Command::execute()
 		executeInvite();
 	else if (_command == "TOPIC")
 		executeTopic();
-	// else if (_command == "MODE")
-	// 	executeMode();
+	else if (_command == "MODE")
+		executeMode();
 	else if (_command == "KICK")
 		executeKick();
 	else if (_command == "QUIT")
