@@ -6,7 +6,7 @@
 /*   By: ertrigna <ertrigna@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/09 14:20:40 by ertrigna          #+#    #+#             */
-/*   Updated: 2025/12/09 19:44:47 by ertrigna         ###   ########.fr       */
+/*   Updated: 2025/12/16 11:41:01 by ertrigna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 
 void	Bot::onUserJoin(Channel *channel, Client* user)
 {
-	std::string msg = "Welcome " + user->getNickname() + "! Respecte mon autorite 👮";
+	std::string msg = "Welcome " + user->getNickname() + " 👮 BotCop is watching you 👀";
 	sendToChannel(channel, msg);
 }
 
@@ -65,7 +65,6 @@ void	Bot::kickUser(Channel* channel, Client* user, const std::string& reason)
 	channel->removeMember(user);
 	if (channel->getMembersCount() == 0)
 		_serv->destroyChannel(channel->getName());
-	// Ne pas déconnecter l'utilisateur, juste le retirer du channel
 }
 
 void	Bot::dadJoke(Channel* channel)
