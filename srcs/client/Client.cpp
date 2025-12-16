@@ -6,7 +6,7 @@
 /*   By: ertrigna <ertrigna@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/14 16:12:04 by ertrigna          #+#    #+#             */
-/*   Updated: 2025/11/19 17:57:19 by ertrigna         ###   ########.fr       */
+/*   Updated: 2025/12/16 16:40:33 by ertrigna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,5 +87,5 @@ bool Client::hasCompleteMessage() const
 
 std::string Client::getPrefix() const
 {
-	return _nickname + "!" + _username + "@" + _hostname;
+	return _nickname + "!" + _username + "@student.42.fr";
 }
