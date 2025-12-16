@@ -25,6 +25,8 @@ void Channel::removeMember(Client* client)
 		_members.erase(it);
 	// On retire aussi des operateurs si c'etait un OP
 	removeOperator(client);
+	// Si plus d'operateurs, promouvoir automatiquement le premier membre
+	promoteFirstMemberIfNeeded();
 }
 
 bool Channel::isMember(Client* client) const
@@ -48,6 +50,20 @@ void Channel::removeOperator(Client* client)
 bool Channel::isOperator(Client* client) const
 {
 	return (std::find(_operators.begin(), _operators.end(), client) != _operators.end());
+}
+
+void Channel::promoteFirstMemberIfNeeded()
+{
+	// Si il n'y a plus d'opérateurs mais qu'il reste des membres
+	if (_operators.empty() && !_members.empty())
+	{
+		Client* newOp = _members[0];
+		addOperator(newOp);
+		
+		// Envoyer un message au canal pour informer de la promotion automatique
+		std::string promotionMsg = ":Server MODE " + _name + " +o " + newOp->getNickname();
+		broadcast(promotionMsg, NULL);
+	}
 }
 
 void Channel::addInvite(Client *client)
