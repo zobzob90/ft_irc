@@ -55,7 +55,7 @@ void Command::executeNick()
 	if (_client->isAuthenticated() && !_client->getUsername().empty() && !_client->isRegistered())
 	{
 		_client->setRegistered(true);
-		std::string welcome = "Welcome to the IRC Network " + _client->getPrefix();
+		std::string welcome = ":Welcome to the IRC Network " + _client->getPrefix();
 		sendReply(1, welcome);
 	}
 }
@@ -181,7 +181,7 @@ void 	Command::executeQuit()
 	
 	if (_params.size() > 0)
 		leaveMsg = _params[0];
-	std::string quitMessage = _client->getPrefix() + " QUIT : " + leaveMsg;
+	std::string quitMessage = ":" + _client->getPrefix() + " QUIT :" + leaveMsg;
 	std::map<std::string, Channel*>& channels = _server->getChannels();
 	for (std::map<std::string, Channel*>::iterator it = channels.begin(); it != channels.end(); ++it)
 	{
@@ -317,7 +317,7 @@ void		Command::executeTopic(){
 	channel->setTopic(newTopic);
 
 	// Notifier tous les membres du channel du changement de topic
-	std::string topicMsg = ":" + _client->getPrefix() + " TOPIC " + channelName + " : " + newTopic;
+	std::string topicMsg = ":" + _client->getPrefix() + " TOPIC " + channelName + " :" + newTopic;
 	channel->broadcast(topicMsg, NULL);
 }
 

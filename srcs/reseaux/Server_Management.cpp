@@ -24,13 +24,14 @@ void	Server::handleNewConnection()
 	int	clientFd = accept(_serverSocket, (sockaddr *)&clientAddr, &len);
 	if (clientFd < 0)
 		return ;
-	
+
 	if (fcntl(clientFd, F_SETFL, O_NONBLOCK) < 0)
-	{
-		close(clientFd);
-		return ;
-	}
-	
+    {
+        std::cerr << "fcntl() failed on client socket" << std::endl;
+        close(clientFd);
+        return;
+    }
+
 	Client* newClient = new Client(clientFd);
 
 	char ip[INET_ADDRSTRLEN];
@@ -46,7 +47,7 @@ void	Server::handleNewConnection()
 	p.revents = 0; // initialise le champ de retour a 0
 	_pollFds.push_back(p);
 	
-	std::cout << "👤 New client connected (fd=" << clientFd << ")" << std::endl;
+	std::cout << "New client connected (fd=" << clientFd << ")" << std::endl;
 }
 
 void	Server::sendToUser(Client* user, const std::string& msg)
@@ -69,30 +70,59 @@ void	Server::sendToUser(Client* user, const std::string& msg)
 		return ;
 }
 
+std::vector<Channel*> Server::getClientChannels(Client* client)
+{
+    std::vector<Channel*> result;
+    
+    for (std::map<std::string, Channel*>::iterator it = _channels.begin(); 
+         it != _channels.end(); ++it)
+    {
+        if (it->second->isMember(client))
+            result.push_back(it->second);
+    }
+    
+    return result;
+}
+
 void	Server::removeClient(int fd)
 {
-	if (fd < 0 || fd == _serverSocket)
-		return ;
+    if (fd < 0 || fd == _serverSocket)
+        return ;
 
-	std::cout << "❌ Client disconnected (fd=" << fd << ")" << std::endl;
-	close(fd);
+    std::map<int, Client*>::iterator it = _clients.find(fd);
+    
+    if (it != _clients.end())
+    {
+        Client* client = it->second;
+        std::string nickname = client->getNickname();
+        
+        // Message QUIT conforme IRC
+        std::string quitMsg = ":" + nickname + " QUIT :Client disconnected\r\n";
+        
+        // Notifier les channels où le client était présent
+        std::vector<Channel*> clientChannels = getClientChannels(client);
+        for (size_t i = 0; i < clientChannels.size(); i++)
+        {
+            clientChannels[i]->broadcast(quitMsg, NULL);
+            clientChannels[i]->removeMember(client);
+        }
+        
+        std::cout << "Client disconnected: " << nickname << " (fd=" << fd << ")" << std::endl;
+        
+        delete client;
+        _clients.erase(it);
+    }
 
-	std::map<int, Client*>::iterator it = _clients.find(fd);
-	
-	if (it != _clients.end())
-	{
-		delete it->second;
-		_clients.erase(it);
-	}
+    close(fd);
 
-	for (size_t i = 0; i < _pollFds.size(); i++)
-	{
-		if (_pollFds[i].fd == fd)
-		{
-			_pollFds.erase(_pollFds.begin() + i);
-			break;
-		}
-	}
+    for (size_t i = 0; i < _pollFds.size(); i++)
+    {
+        if (_pollFds[i].fd == fd)
+        {
+            _pollFds.erase(_pollFds.begin() + i);
+            break;
+        }
+    }
 }
 
 void	Server::handleClientMessage(int fd)
@@ -131,7 +161,7 @@ void	Server::handleClientMessage(int fd)
         if (message.empty())
             continue;
         
-        // Nettoyer les caractères de contrôle (important pour netcat)
+        // Nettoyer des caratère parasite
         std::string cleanMsg;
         for (size_t i = 0; i < message.length(); ++i)
         {
@@ -142,7 +172,7 @@ void	Server::handleClientMessage(int fd)
         if (cleanMsg.empty())
             continue;
         
-        std::cout << "[fd " << fd << "] " << cleanMsg << std::endl;
+        std::cout << "[" << client->getNickname() << "] " << cleanMsg << std::endl;
         Command cmd(this, client, cleanMsg);
         cmd.execute();
 		
@@ -152,7 +182,7 @@ void	Server::handleClientMessage(int fd)
 			
         if (client->isMarkedForDisconnect())
         {
-            std::cout << "⚠️ Client kicked by bot, disconnecting [fd " << fd << "]" << std::endl;
+            std::cout << "Client kicked/removed: " << client->getNickname() << " (fd=" << fd << ")" << std::endl;
             removeClient(fd);
             return;
         }
@@ -168,7 +198,7 @@ void	Server::closeServer()
 
 	for (std::map<int, Client *>::iterator it = _clients.begin(); it != _clients.end(); ++it)
 	{
-		std::string quitMsg = ":server QUIT :Server shutting down\r\n";
+		std::string quitMsg = "ERROR :Server shutting down\r\n";
 		send(it->first, quitMsg.c_str(), quitMsg.size(), 0);
 		close(it->first);
 		delete it->second;

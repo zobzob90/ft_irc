@@ -21,13 +21,13 @@ void	Bot::onUserJoin(Channel *channel, Client* user)
 
 void	Bot::sendToChannel(Channel* channel, const std::string& msg)
 {
-	std::string formattedMsg = ":" + _name + " PRIVMSG " + channel->getName() + " :" + msg;
+	std::string formattedMsg = ":" + _botClient->getPrefix() + " PRIVMSG " + channel->getName() + " :" + msg;
 	channel->broadcast(formattedMsg, NULL);
 }
 
 void	Bot::sendToUser(Client* user, const std::string& reason)
 {
-	std::string formattedMsg = ":" + _name + " PRIVMSG " + user->getNickname() + " :" + reason;
+	std::string formattedMsg = ":" + _botClient->getPrefix() + " PRIVMSG " + user->getNickname() + " :" + reason;
 	_serv->sendToUser(user, formattedMsg);
 }
 
@@ -59,12 +59,13 @@ bool	Bot::containsBadWord(const std::string& msg) const
 
 void	Bot::kickUser(Channel* channel, Client* user, const std::string& reason)
 {
-	std::string msg = ":" + _name + " KICK " + channel->getName() + " " + user->getNickname() + " :" + reason;
+	std::string msg = ":" + _botClient->getPrefix() + " KICK " + channel->getName() + " " + user->getNickname() + " :" + reason;
 	channel->broadcast(msg, NULL);
+	std::cout << "🚨 " << _name << " kicked " << user->getNickname() << " from " << channel->getName() << ": " << reason << std::endl;
 	channel->removeMember(user);
 	if (channel->getMembersCount() == 0)
 		_serv->destroyChannel(channel->getName());
-	user->markForDisconnect();
+	// Ne pas déconnecter l'utilisateur, juste le retirer du channel
 }
 
 void	Bot::dadJoke(Channel* channel)
