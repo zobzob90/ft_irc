@@ -6,14 +6,15 @@
 /*   By: ertrigna <ertrigna@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/03 17:52:17 by ertrigna          #+#    #+#             */
-/*   Updated: 2025/12/09 19:54:21 by ertrigna         ###   ########.fr       */
+/*   Updated: 2025/12/15 17:49:57 by ertrigna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Server.hpp"
 #include "Command.hpp"
+#include "Bot.hpp"
 
-volatile sig_atomic_t g_stop = 0;
+extern volatile sig_atomic_t g_stop;
 
 void	Server::handleNewConnection()
 {
@@ -57,7 +58,16 @@ void	Server::sendToUser(Client* user, const std::string& msg)
 	if (fd < 0)
 		return ;
 	std::string formattedMsg = msg + "\r\n";
-	send(fd, formattedMsg.c_str(), formattedMsg.size(), 0);
+	ssize_t sent = send(fd, formattedMsg.c_str(), formattedMsg.size(), 0);
+	if (sent < 0)
+	{
+		if (errno == EAGAIN || errno == EWOULDBLOCK)
+			return ;
+		else if (errno == EPIPE || errno == ECONNRESET)
+			return ;
+	}
+	else if (sent < (ssize_t)formattedMsg.size())
+		return ;
 }
 
 std::vector<Channel*> Server::getClientChannels(Client* client)
@@ -140,6 +150,12 @@ void	Server::handleClientMessage(int fd)
     // Traiter tous les messages complets
     while (client->hasCompleteMessage())
     {
+		it = _clients.find(fd);
+		if (it == _clients.end())
+			return ;
+		client = it->second;
+		if (!client)
+			return;
         std::string message = client->extractMessage();
         
         if (message.empty())
@@ -159,7 +175,11 @@ void	Server::handleClientMessage(int fd)
         std::cout << "[" << client->getNickname() << "] " << cleanMsg << std::endl;
         Command cmd(this, client, cleanMsg);
         cmd.execute();
-        
+		
+		it = _clients.find(fd);
+        if (it == _clients.end())
+			return ;
+			
         if (client->isMarkedForDisconnect())
         {
             std::cout << "Client kicked/removed: " << client->getNickname() << " (fd=" << fd << ")" << std::endl;
@@ -169,15 +189,12 @@ void	Server::handleClientMessage(int fd)
     }
 }
 
-void	Server::signalHandler(int signum)
-{
-	if (signum == SIGINT || signum == SIGQUIT)
-		g_stop = 1;
-}
-
 void	Server::closeServer()
 {
-	std::cout << "\nShutting down server..." << std::endl;
+	if (_serverSocket < 0)
+		return;
+		
+	std::cout << "\n\033[1;33m🔌 Closing server...\033[0m" << std::endl;
 
 	for (std::map<int, Client *>::iterator it = _clients.begin(); it != _clients.end(); ++it)
 	{
@@ -192,6 +209,12 @@ void	Server::closeServer()
 		delete it->second;
 	_channels.clear();
 
+	if (_bot)
+	{
+		delete _bot;
+		_bot = NULL;
+	}
+
 	if (_serverSocket >= 0)
 	{
 		close(_serverSocket);
@@ -199,7 +222,7 @@ void	Server::closeServer()
 	}
 
 	_pollFds.clear();
-	std::cout << "Server closed successfully." << std::endl; 
+	std::cout << "\033[1;32m✅ Server closed! Goodbye!\033[0m" << std::endl;
 }
 
 void	Server::run()
@@ -216,6 +239,8 @@ void	Server::run()
 		
 		if (ret < 0)
 		{
+			if (errno == EINTR)
+				continue;
 			if (g_stop)
 				break;
 			throw std::runtime_error("poll() failed");
@@ -235,8 +260,6 @@ void	Server::run()
 				else
 					handleClientMessage(currentFd);
 			}
-			// if (currentRevents & (POLLHUP | POLLERR))
-			// 	removeClient(currentFd);
 		}
 	}
 	closeServer();

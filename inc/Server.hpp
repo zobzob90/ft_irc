@@ -6,7 +6,7 @@
 /*   By: ertrigna <ertrigna@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/03 17:52:20 by ertrigna          #+#    #+#             */
-/*   Updated: 2025/12/09 17:13:26 by ertrigna         ###   ########.fr       */
+/*   Updated: 2025/12/15 16:48:41 by ertrigna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,7 @@
 #include <arpa/inet.h>
 #include <poll.h>
 #include <fcntl.h>
+#include <cerrno>
 
 #include "Client.hpp"
 #include "Channel.hpp"
@@ -72,7 +73,6 @@ class Server
 		void		markForDisconnect(Client* client);
 
 		//SERVER MANAGEMENTS
-		void		signalHandler(int signum); // fonction pour gerer les signaux
 		void		closeServer(); // fonction pour fermer le server
 		void		sendToUser(Client* user, const std::string& msg);
 		void		handleNewConnection(); // gerer la connection
