@@ -20,19 +20,10 @@ objs/
 *.pch
 
 # ============================================
-# DOSSIER TEST - FICHIERS GÉNÉRÉS
+# DOSSIER TEST - INTÉGRALITÉ DU DOSSIER
 # ============================================
-# Sortie Valgrind (fichier généré par les tests)
-test/valgrind-output.txt
-
-# Logs de tests (si générés)
-test/*.log
-test/*.tmp
-
-# Cache Python
-test/__pycache__/
-test/*.pyc
-test/*.pyo
+# Ignorer tout le dossier test
+test/
 
 # ============================================
 # FICHIERS SYSTÈME
