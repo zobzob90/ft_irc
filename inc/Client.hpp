@@ -25,13 +25,14 @@ class Client
 		std::string	_realname;	// (USER CMD)
 		std::string	_hostname;	// IP/Hostname
 		std::string	_buffer;	// Buffer pour messages partiels
+		std::string	_outputBuffer;	// Buffer pour messages sortants en attente
 		bool		_authenticated;	// A-t-il envoye le bon PASS(word)
 		bool		_registered;	// A-t-il fait NICK+USER
 		bool		_toDisconnect;
 		
 	public:
 		// Constructeur + Destructeur
-		Client(int fd): _fd(fd), _nickname(""), _username(""), _realname(""), _hostname(""), _buffer(""), _authenticated(false), _registered(false), _toDisconnect(false) {};
+		Client(int fd): _fd(fd), _nickname(""), _username(""), _realname(""), _hostname(""), _buffer(""), _outputBuffer(""), _authenticated(false), _registered(false), _toDisconnect(false) {};
 		~Client() {};
 
 		// GETTER
@@ -63,6 +64,12 @@ class Client
 		std::string	getPrefix() const;
 		bool		isMarkedForDisconnect() const {return _toDisconnect; }
 		void		markForDisconnect() { _toDisconnect = true; }
+		
+		// OUTPUT BUFFER MANAGEMENT
+		void		appendOutputBuffer(const std::string& data);
+		bool		hasOutputPending() const;
+		std::string	getOutputBuffer() const;
+		void		clearOutputBuffer(size_t bytes);
 } ;
 
 #endif

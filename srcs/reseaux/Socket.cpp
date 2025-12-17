@@ -60,36 +60,3 @@ Server::~Server()
     if (_bot)
         delete _bot;
 }
-
-void	Server::createSocket()
-{
-	_serverSocket = socket(AF_INET,SOCK_STREAM, IPPROTO_TCP); // AF_INET(domain en IPv4), SOCK_STREAM (protocole TCP le plus fiable), IPPROTO_TCP (param par defaut)
-	if (_serverSocket < 0)
-		throw std::runtime_error("Error: socket() failed");
-	if (fcntl(_serverSocket, F_SETFL, O_NONBLOCK) < 0)
-		throw std::runtime_error("Error: fcntl() failed");
-	int opt = 1; // valeur d'option de socket (1 = true, 0 =  false)
-	if (setsockopt(_serverSocket, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) < 0) // active le mode reutiliser l'adrresse pour ce socket
-		throw std::runtime_error("Error: setsocketoption failed");
-}
-
-void	Server::configAddr()
-{
-	sockaddr_in addr;
-	std::memset(&addr, 0, sizeof(addr));
-	addr.sin_family = AF_INET;
-	addr.sin_addr.s_addr = INADDR_ANY;
-	addr.sin_port = htons(_port);
-
-	if (bind(_serverSocket, (sockaddr *)&addr, sizeof(addr)) < 0)
-		throw std::runtime_error("Error: bind() failed");
-	if (listen(_serverSocket, 10) < 0)
-		throw std::runtime_error("Error: listen() failed");
-}
-
-void	Server::setUpServerSocket()
-{
-	createSocket();
-	configAddr();
-	std::cout << "\033[1;32m✅ Server listening on port \033[1;37m" << _port << " \033[1;32m⚡ ONLINE\033[0m" << std::endl;
-}

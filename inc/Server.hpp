@@ -45,10 +45,6 @@ class Server
 		std::map<std::string, Channel*> _channels;
 		Bot* 							_bot;
 
-		void	createSocket();
-		void	configAddr();
-		void	setUpServerSocket();
-
 	public:
 	
 		//CONSTRUCTEUR + DESTRUCTEUR
@@ -75,6 +71,7 @@ class Server
 		//SERVER MANAGEMENTS
 		void		closeServer(); // fonction pour fermer le server
 		void		sendToUser(Client* user, const std::string& msg);
+		void		flushClientOutput(int fd); // envoyer les données bufferisées
 		void		handleNewConnection(); // gerer la connection
 		void		handleClientMessage(int fd); // gerer les messages
 		void		removeClient(int fd); // enlever un client
