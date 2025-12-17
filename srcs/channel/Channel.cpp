@@ -11,6 +11,7 @@
 /* ************************************************************************** */
 
 #include "Channel.hpp"
+#include "Server.hpp"  // Inclure pour accéder à sendToUser()
 
 void Channel::addMember(Client* client)
 {
@@ -86,12 +87,26 @@ bool Channel::isInvited(Client* client) const
 
 void Channel::broadcast(const std::string& message, Client *exclude)
 {
+	if (!_server)
+	{
+		// Fallback si pas de serveur (ne devrait pas arriver)
+		for (size_t i = 0; i < _members.size(); i++)
+		{
+			if (_members[i] != exclude)
+			{
+				std::string msg = message + "\r\n";
+				send(_members[i]->getFd(), msg.c_str(), msg.length(), 0);
+			}
+		}
+		return;
+	}
+	
+	// Utiliser le système de buffering du serveur
 	for (size_t i = 0; i < _members.size(); i++)
 	{
 		if (_members[i] != exclude)
 		{
-			std::string msg = message + "\r\n";
-			send(_members[i]->getFd(), msg.c_str(), msg.length(), 0);
+			_server->sendToUser(_members[i], message);
 		}
 	}
 }

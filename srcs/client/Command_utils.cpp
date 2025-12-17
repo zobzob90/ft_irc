@@ -71,7 +71,11 @@ bool Command::checkParamSize(size_t required, const std::string& cmdName)
 {
 	if (_params.size() < required)
 	{
-		if (cmdName == "PASS" || cmdName == "NICK" || cmdName == "USER" || 
+		if (cmdName == "NICK")
+		{
+			sendError(431, ":No nickname given");
+		}
+		else if (cmdName == "PASS" || cmdName == "USER" || 
 			cmdName == "JOIN" || cmdName == "PART" || cmdName == "KICK" || 
 			cmdName == "INVITE" || cmdName == "TOPIC" || cmdName == "MODE")
 		{

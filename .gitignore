@@ -1,0 +1,81 @@
+# ============================================
+# ft_irc - Configuration .gitignore
+# ============================================
+
+# ============================================
+# FICHIERS COMPILÉS
+# ============================================
+# Exécutable du serveur
+ircserv
+
+# Fichiers objets C++
+*.o
+*.obj
+objs/
+*.out
+
+# Fichiers temporaires de compilation
+*.d
+*.gch
+*.pch
+
+# ============================================
+# DOSSIER TEST - INTÉGRALITÉ DU DOSSIER
+# ============================================
+# Ignorer tout le dossier test
+test/*
+
+# ============================================
+# FICHIERS SYSTÈME
+# ============================================
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Linux
+*~
+.fuse_hidden*
+.directory
+.Trash-*
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# ============================================
+# ÉDITEURS / IDEs
+# ============================================
+# VS Code
+.vscode/
+*.code-workspace
+
+# Vim
+*.swp
+*.swo
+*.swn
+.*.sw?
+
+# Emacs
+*~
+\#*\#
+.\#*
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# JetBrains (CLion, etc.)
+.idea/
+*.iml
+
+# ============================================
+# NOTES / DOCUMENTATION TEMPORAIRE
+# ============================================
+# Notes personnelles (optionnel)
+TODO.txt
+NOTES.txt
+*.bak
+*.backup

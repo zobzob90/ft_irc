@@ -49,17 +49,63 @@ void	Server::sendToUser(Client* user, const std::string& msg)
 	int fd = user->getFd();
 	if (fd < 0)
 		return ;
+	
+	// Ajouter \r\n au message et le mettre dans le buffer de sortie
 	std::string formattedMsg = msg + "\r\n";
-	ssize_t sent = send(fd, formattedMsg.c_str(), formattedMsg.size(), 0);
-	if (sent < 0)
+	user->appendOutputBuffer(formattedMsg);
+	
+	// Activer POLLOUT pour ce client
+	for (size_t i = 0; i < _pollFds.size(); i++)
 	{
-		if (errno == EAGAIN || errno == EWOULDBLOCK)
-			return ;
-		else if (errno == EPIPE || errno == ECONNRESET)
-			return ;
+		if (_pollFds[i].fd == fd)
+		{
+			_pollFds[i].events |= POLLOUT;
+			break;
+		}
 	}
-	else if (sent < (ssize_t)formattedMsg.size())
-		return ;
+}
+
+void	Server::flushClientOutput(int fd)
+{
+	std::map<int, Client*>::iterator it = _clients.find(fd);
+	if (it == _clients.end())
+		return;
+	
+	Client* client = it->second;
+	if (!client || !client->hasOutputPending())
+		return;
+	
+	std::string data = client->getOutputBuffer();
+	if (data.empty())
+		return;
+	
+	ssize_t sent = send(fd, data.c_str(), data.size(), 0);
+	
+	if (sent > 0)
+	{
+		// Effacer les données envoyées du buffer
+		client->clearOutputBuffer(sent);
+		
+		// Si tout a été envoyé, désactiver POLLOUT
+		if (!client->hasOutputPending())
+		{
+			for (size_t i = 0; i < _pollFds.size(); i++)
+			{
+				if (_pollFds[i].fd == fd)
+				{
+					_pollFds[i].events &= ~POLLOUT;
+					break;
+				}
+			}
+		}
+	}
+	else if (sent < 0)
+	{
+		// Si send() échoue alors que poll() a indiqué POLLOUT,
+		// c'est une vraie erreur (connexion cassée, etc.)
+		removeClient(fd);
+	}
+	// Si sent == 0, on ne fait rien (cas rare mais possible)
 }
 
 std::vector<Channel*> Server::getClientChannels(Client* client)
@@ -181,7 +227,7 @@ void	Server::run()
 				continue;
 			if (g_stop)
 				break;
-			throw std::runtime_error("poll() failed");
+			throw std::runtime_error("poll failed");
 		}
 		size_t currentSize = _pollFds.size();
 		for (size_t i = 0; i < currentSize; ++i)
@@ -195,6 +241,11 @@ void	Server::run()
 					handleNewConnection();
 				else
 					handleClientMessage(currentFd);
+			}
+			
+			if (currentRevents & POLLOUT)
+			{
+				flushClientOutput(currentFd);
 			}
 		}
 	}

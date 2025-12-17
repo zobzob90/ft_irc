@@ -208,8 +208,8 @@ void	Command::executePrivmsg()
 		Client* recipient = findClientByNick(target);
 		if (!recipient)
 			return;
-		std::string ircMessage = ":" + _client->getPrefix() + " PRIVMSG " + target + " :" + message + "\r\n";
-		send(recipient->getFd(), ircMessage.c_str(), ircMessage.length(), 0);
+		std::string ircMessage = ":" + _client->getPrefix() + " PRIVMSG " + target + " :" + message;
+		_server->sendToUser(recipient, ircMessage);
 	}
 }
 

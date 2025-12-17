@@ -89,3 +89,27 @@ std::string Client::getPrefix() const
 {
 	return _nickname + "!" + _username + "@student.42.fr";
 }
+
+// OUTPUT BUFFER MANAGEMENT
+void Client::appendOutputBuffer(const std::string& data)
+{
+	_outputBuffer += data;
+}
+
+bool Client::hasOutputPending() const
+{
+	return !_outputBuffer.empty();
+}
+
+std::string Client::getOutputBuffer() const
+{
+	return _outputBuffer;
+}
+
+void Client::clearOutputBuffer(size_t bytes)
+{
+	if (bytes >= _outputBuffer.size())
+		_outputBuffer.clear();
+	else
+		_outputBuffer.erase(0, bytes);
+}
