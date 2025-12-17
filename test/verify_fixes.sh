@@ -30,42 +30,44 @@ check() {
 }
 
 echo -e "${BLUE}1. Vérification de la compilation...${NC}"
-make re > /dev/null 2>&1
-check $? "Compilation sans erreurs"
+cd .. && make re > /dev/null 2>&1
+COMPILE_STATUS=$?
+cd test
+check $COMPILE_STATUS "Compilation sans erreurs"
 echo ""
 
 echo -e "${BLUE}2. Vérification des fichiers modifiés...${NC}"
 
 # Vérifier Bot.cpp
-grep -q "std::string channelName = channel->getName()" srcs/bot/Bot.cpp
+grep -q "std::string channelName = channel->getName()" ../srcs/bot/Bot.cpp
 check $? "Bot.cpp: Fix use-after-free appliqué"
 
 # Vérifier Channel_Management.cpp
-grep -q "isValidChannelName" srcs/channel/Channel_Management.cpp
+grep -q "isValidChannelName" ../srcs/channel/Channel_Management.cpp
 check $? "Channel_Management.cpp: Fonction de validation ajoutée"
 
-grep -q "MAX_CHANNELS" srcs/channel/Channel_Management.cpp
+grep -q "MAX_CHANNELS" ../srcs/channel/Channel_Management.cpp
 check $? "Channel_Management.cpp: Limite MAX_CHANNELS définie"
 
 # Vérifier Command_function.cpp (JOIN)
-grep -q "if (!channel)" srcs/client/Command_function.cpp
+grep -q "if (!channel)" ../srcs/client/Command_function.cpp
 check $? "Command_function.cpp: Vérification NULL après createChannel"
 
 # Vérifier Command_function.cpp (NICK validation)
-grep -q "too long" srcs/client/Command_function.cpp
+grep -q "too long" ../srcs/client/Command_function.cpp
 check $? "Command_function.cpp: Validation longueur nickname ajoutée"
 
-grep -q "cannot start with digit" srcs/client/Command_function.cpp
+grep -q "cannot start with digit" ../srcs/client/Command_function.cpp
 check $? "Command_function.cpp: Validation début par chiffre ajoutée"
 
 echo ""
 echo -e "${BLUE}3. Vérification de l'exécutable...${NC}"
 
-if [ -f "./ircserv" ]; then
+if [ -f "../ircserv" ]; then
     check 0 "Exécutable ircserv existe"
     
     # Vérifier la taille (devrait être > 200KB avec les nouvelles validations)
-    SIZE=$(stat -f%z "./ircserv" 2>/dev/null || stat -c%s "./ircserv" 2>/dev/null)
+    SIZE=$(stat -f%z "../ircserv" 2>/dev/null || stat -c%s "../ircserv" 2>/dev/null)
     if [ $SIZE -gt 200000 ]; then
         check 0 "Taille de l'exécutable correcte (${SIZE} bytes)"
     else
@@ -78,10 +80,10 @@ fi
 echo ""
 echo -e "${BLUE}4. Vérification des fichiers de documentation...${NC}"
 
-[ -f "ANALYSE_BUGS.md" ]
+[ -f "../ANALYSE_BUGS.md" ]
 check $? "ANALYSE_BUGS.md créé"
 
-[ -f "CORRECTIFS_APPLIQUES.md" ]
+[ -f "../CORRECTIFS_APPLIQUES.md" ]
 check $? "CORRECTIFS_APPLIQUES.md créé"
 
 [ -f "test_edge_cases.py" ]

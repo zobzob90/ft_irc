@@ -17,10 +17,10 @@ echo -e "${BLUE}FT_IRC - Test Runner${NC}"
 echo -e "${BLUE}================================${NC}\n"
 
 # Vérifier si le serveur est compilé
-if [ ! -f "./ircserv" ]; then
+if [ ! -f "../ircserv" ]; then
     echo -e "${YELLOW}⚠ Le serveur n'est pas compilé${NC}"
     echo -e "${GREEN}Compilation en cours...${NC}"
-    make
+    cd .. && make && cd test
     if [ $? -ne 0 ]; then
         echo -e "${RED}✗ Erreur de compilation${NC}"
         exit 1
@@ -52,7 +52,7 @@ trap cleanup SIGINT SIGTERM
 echo -e "${BLUE}Démarrage du serveur IRC...${NC}"
 echo -e "${BLUE}Port: ${PORT}, Password: ${PASSWORD}${NC}\n"
 
-./ircserv $PORT $PASSWORD &
+../ircserv $PORT $PASSWORD &
 SERVER_PID=$!
 
 # Attendre que le serveur démarre

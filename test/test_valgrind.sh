@@ -23,9 +23,9 @@ if ! command -v valgrind &> /dev/null; then
 fi
 
 # Vérifier si le serveur est compilé
-if [ ! -f "./ircserv" ]; then
+if [ ! -f "../ircserv" ]; then
     echo -e "${YELLOW}⚠ Compilation du serveur...${NC}"
-    make
+    cd .. && make && cd test
     if [ $? -ne 0 ]; then
         echo -e "${RED}✗ Erreur de compilation${NC}"
         exit 1
@@ -50,7 +50,7 @@ valgrind \
     --track-origins=yes \
     --verbose \
     --log-file=valgrind-output.txt \
-    ./ircserv $PORT $PASSWORD
+    ../ircserv $PORT $PASSWORD
 
 echo -e "\n${GREEN}✓ Rapport Valgrind sauvegardé dans: valgrind-output.txt${NC}"
 echo -e "${BLUE}Affichage du résumé:${NC}\n"
