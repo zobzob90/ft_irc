@@ -80,6 +80,12 @@ class Server
 	void		handleClientMessage(int fd); // gerer les messages
 	void		removeClient(int fd); // enlever un client
 	void		run(); // fonction principale pour runner le server
+
+	// SERVER UTILS
+        std::string    cleanMessage(const std::string& msg);
+        void        removePollFd(int fd);
+        Client*        getClientByFd(int fd);
+        void        addPollFd(int fd, short events);
 } ;
 
 #endif
