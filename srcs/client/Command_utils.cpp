@@ -6,7 +6,7 @@
 /*   By: ertrigna <ertrigna@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/21 20:40:50 by ertrigna          #+#    #+#             */
-/*   Updated: 2025/12/16 21:19:47 by ertrigna         ###   ########.fr       */
+/*   Updated: 2025/12/17 14:30:22 by ertrigna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -217,22 +217,18 @@ bool Command::applyModeO(Channel* channel, bool adding, size_t& paramIdx, const 
 		sendError(461, "MODE +o/-o :Not enough parameters");
 		return false;
 	}
-	
 	Client* target = findClientByNick(_params[paramIdx]);
 	if (!target)
 		return false;
-	
 	if (!channel->isMember(target))
 	{
 		sendError(441, _params[paramIdx] + " " + channelName + " :They aren't on that channel");
 		return false;
 	}
-	
 	if (adding)
 		channel->addOperator(target);
 	else
 		channel->removeOperator(target);
-	
 	applied += (adding ? "+" : "-");
 	applied += "o";
 	appliedParams += " " + _params[paramIdx++];
