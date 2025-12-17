@@ -6,7 +6,7 @@
 /*   By: ertrigna <ertrigna@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/03 17:53:55 by ertrigna          #+#    #+#             */
-/*   Updated: 2025/12/16 16:21:26 by ertrigna         ###   ########.fr       */
+/*   Updated: 2025/12/17 13:04:54 by ertrigna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,6 @@ void	signalHandler(int signum)
 	else if (signum == SIGTSTP)
 		std::cout << "\n\033[1;31m❌ SIGTSTP (Ctrl+Z) is disabled for this server.\033[0m" << std::endl;
 }
-
 
 void	printTitle(int port, const std::string &pass)
 {

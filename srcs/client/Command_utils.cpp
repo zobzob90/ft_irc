@@ -6,7 +6,7 @@
 /*   By: ertrigna <ertrigna@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/21 20:40:50 by ertrigna          #+#    #+#             */
-/*   Updated: 2025/12/16 17:21:03 by ertrigna         ###   ########.fr       */
+/*   Updated: 2025/12/16 21:19:47 by ertrigna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -125,7 +125,7 @@ void Command::displayChannelModes(Channel* channel, const std::string& channelNa
 {
 	std::string modes = "+";
 	std::string params = "";
-	
+
 	if (channel->isInviteOnly()) 
 		modes += "i";
 	if (channel->isTopicRestricted()) 
