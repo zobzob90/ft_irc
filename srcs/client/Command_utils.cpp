@@ -6,7 +6,7 @@
 /*   By: ertrigna <ertrigna@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/21 20:40:50 by ertrigna          #+#    #+#             */
-/*   Updated: 2025/12/09 19:18:15 by ertrigna         ###   ########.fr       */
+/*   Updated: 2025/12/16 21:19:47 by ertrigna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -94,7 +94,6 @@ void	Command::sendError(int code, const std::string& message)
 	std::ostringstream oss;
 
 	oss << ":" << "server" << " " << code << " ";
-
 	if (!_client->getNickname().empty())
 		oss << _client->getNickname() << " ";
 	else
@@ -108,19 +107,15 @@ void	Command::sendReply(int code, const std::string& message)
 {
 	std::ostringstream oss;
 
-	oss << ":" << "server" << " ";
-	
+	oss << ":" << "\033[1;31m[IRC]\033[0m" << " ";
 	if (code < 10)
 		oss << "00" << code;
 	else if (code < 100)
 		oss << "0" << code;
 	else
 		oss << code;
-	
 	oss << " " << _client->getNickname() << " " << message;
-
-	std::string response = oss.str();
-	
+	std::string response = oss.str();	
 	_server->sendToUser(_client, response);
 }
 
@@ -130,7 +125,7 @@ void Command::displayChannelModes(Channel* channel, const std::string& channelNa
 {
 	std::string modes = "+";
 	std::string params = "";
-	
+
 	if (channel->isInviteOnly()) 
 		modes += "i";
 	if (channel->isTopicRestricted()) 

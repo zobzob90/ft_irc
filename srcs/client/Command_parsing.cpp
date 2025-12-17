@@ -6,7 +6,7 @@
 /*   By: ertrigna <ertrigna@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/14 16:41:24 by ertrigna          #+#    #+#             */
-/*   Updated: 2025/12/09 19:49:06 by ertrigna         ###   ########.fr       */
+/*   Updated: 2025/12/16 13:25:44 by ertrigna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,8 @@ void Command::parse(const std::string& message)
 {
 	std::istringstream	iss(message);
 	std::string			word;
+
+	bool hasTrailing = false;
 
 	if (iss >> _command)
 	{
@@ -30,7 +32,7 @@ void Command::parse(const std::string& message)
 		if (word[0] == ':')
 		{
 			//Extraire tout le reste de la ligne
-
+			hasTrailing = true;
 			std::string trailing = word.substr(1); // Enleve le ':'
 			std::string	rest;
 			std::getline(iss, rest);
@@ -41,10 +43,25 @@ void Command::parse(const std::string& message)
 		}
 		_params.push_back(word);
 	}
+
+	if (_command == "PRIVMSG")
+	{
+		if(_params.size() != 2 || !hasTrailing)
+		{
+			_params.clear();
+			_command = "";
+			return ;
+		}
+	}
 }
 
 void Command::execute()
 {
+	if (_command.empty())
+	{
+		sendError(461, "PRIVMSG :Bad message format");
+		return ;
+	}
 	// Cmd pour authentification
 	if (_command == "PASS")
 		executePass();
@@ -52,7 +69,6 @@ void Command::execute()
 		executeUser();
 	else if (_command == "NICK")
 		executeNick();
-
 	// Cmd necessitant d'etre authentifie
 	else if (!_client->isAuthenticated() || !_client->isRegistered())
 	{
@@ -77,8 +93,6 @@ void Command::execute()
 		executeKick();
 	else if (_command == "QUIT")
 		executeQuit();
-
-	// // Cmd inconnue
 	else
 		sendError(421, _command + " :Unknown command");
 }
