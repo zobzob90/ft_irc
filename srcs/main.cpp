@@ -6,7 +6,7 @@
 /*   By: ertrigna <ertrigna@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/03 17:53:55 by ertrigna          #+#    #+#             */
-/*   Updated: 2025/12/17 13:04:54 by ertrigna         ###   ########.fr       */
+/*   Updated: 2025/12/17 14:04:35 by ertrigna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,10 +29,14 @@ void	signalHandler(int signum)
 	}
 	else if (signum == SIGTSTP)
 		std::cout << "\n\033[1;31m❌ SIGTSTP (Ctrl+Z) is disabled for this server.\033[0m" << std::endl;
-	else if (signum == SIGPIPE)
-	{
-		return;
-	}
+}
+
+void	setupSignals()
+{
+	signal(SIGINT, signalHandler);
+	signal(SIGQUIT, signalHandler);
+	signal(SIGTSTP, signalHandler);
+	signal(SIGPIPE, SIG_IGN);
 }
 
 void	printTitle(int port, const std::string &pass)
@@ -82,12 +86,8 @@ int main(int ac, char *av[])
 		if(port <= 1023 || port > 65535)
 			throw std::runtime_error(" ❌ Invalid Port Number : must be between 1023 and 65535");
 		printTitle(port, password);
+		setupSignals();
 		Server server(port, password);
-		signal(SIGPIPE, SIG_IGN);
-		signal(SIGINT, signalHandler);
-		signal(SIGQUIT, signalHandler);
-		signal(SIGTSTP, signalHandler);
-		signal(SIGPIPE, signalHandler);  // Ignorer SIGPIPE pour éviter crash sur send()
 		server.run();
 	}
 	catch (const std::exception& e)
