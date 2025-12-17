@@ -84,6 +84,9 @@ void	Server::flushClientOutput(int fd)
 		return;
 	
 	std::string data = client->getOutputBuffer();
+	if (data.empty())
+		return;
+	
 	ssize_t sent = send(fd, data.c_str(), data.size(), 0);
 	
 	if (sent > 0)
@@ -106,9 +109,11 @@ void	Server::flushClientOutput(int fd)
 	}
 	else if (sent < 0)
 	{
-		// En cas d'erreur, fermer la connexion
+		// Si send() échoue alors que poll() a indiqué POLLOUT,
+		// c'est une vraie erreur (connexion cassée, etc.)
 		removeClient(fd);
 	}
+	// Si sent == 0, on ne fait rien (cas rare mais possible)
 }
 
 std::vector<Channel*> Server::getClientChannels(Client* client)

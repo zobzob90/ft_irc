@@ -96,7 +96,7 @@ void	Bot::kickUser(Channel* channel, Client* user, const std::string& reason)
 	
 	channel->removeMember(user);
 	
-	// Vérifier si le channel est vide APRÈS avoir fini de l'utiliser
+	// Vérifier si le channel est vide après avoir fini de l'utiliser
 	if (channel->getMembersCount() == 0)
 	{
 		// Ne plus utiliser le pointeur channel après cette ligne !

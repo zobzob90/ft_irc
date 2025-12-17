@@ -67,20 +67,20 @@ Channel* Server::createChannel(const std::string& name, Client* creator)
 	// Vérifier si le nom du channel est valide
 	if (!isValidChannelName(name))
 	{
-		std::string errorMsg = ":server 403 " + creator->getNickname() + " " + name + " :Invalid channel name\r\n";
-		send(creator->getFd(), errorMsg.c_str(), errorMsg.length(), 0);
+		std::string errorMsg = ":server 403 " + creator->getNickname() + " " + name + " :Invalid channel name";
+		sendToUser(creator, errorMsg);
 		return NULL;
 	}
 	
 	// Vérifier la limite de channels
 	if (_channels.size() >= MAX_CHANNELS)
 	{
-		std::string errorMsg = ":server 405 " + creator->getNickname() + " " + name + " :You have joined too many channels\r\n";
-		send(creator->getFd(), errorMsg.c_str(), errorMsg.length(), 0);
+		std::string errorMsg = ":server 405 " + creator->getNickname() + " " + name + " :You have joined too many channels";
+		sendToUser(creator, errorMsg);
 		return NULL;
 	}
 	
-	Channel* newChannel = new Channel(name);
+	Channel* newChannel = new Channel(name, this);  // Passer le pointeur du serveur
 
 	newChannel->addMember(creator);
 	newChannel->addOperator(creator);
@@ -130,7 +130,7 @@ void Server::removeClientFromAllChannels(Client* client)
 
 void Server::markForDisconnect(Client* client)
 {
-	std::string errorMsg = "ERROR :Closing connection\r\n";
-	send(client->getFd(), errorMsg.c_str(), errorMsg.length(), 0);
+	std::string errorMsg = "ERROR :Closing connection";
+	sendToUser(client, errorMsg);
 	removeClient(client->getFd());
 }

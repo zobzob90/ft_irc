@@ -20,6 +20,8 @@
 #include <sys/socket.h>
 #include "Client.hpp"
 
+class Server;  // Forward declaration
+
 class Channel
 {
 	private:
@@ -29,6 +31,7 @@ class Channel
 		std::string _topic;
 		std::string _password;
 		int			_userLimit;
+		Server*		_server;  // Pointeur vers le serveur
 
 		// LISTES - MEMBRES ET PERM
 		std::vector<Client *> _members;
@@ -43,10 +46,11 @@ class Channel
 
 	public:
 
-		Channel(const std::string& name) :	_name(name),
+		Channel(const std::string& name, Server* server = NULL) :	_name(name),
 											_topic(""),
 											_password(""),
 											_userLimit(0),
+											_server(server),
 											_inviteOnly(false),
 											_topicRestrict(false),
 											_hasPassword(false),
