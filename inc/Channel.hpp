@@ -91,12 +91,11 @@ class Channel
 		void		removeMember(Client* client); // -> Quand quelqu'un fait PART #general ou  QUIT
 		bool		isMember(Client* client) const; // -> Verifie si un client est dans le channel
 		
-		// OPERATOR MANAGEMENT
-		void		addOperator(Client* client); // -> Cmd MODE #general +o Alice
-		void		removeOperator(Client* client); // -> Cmd MODE #general -o Alice
-		bool		isOperator(Client* client) const; // Verifie si un client peut KICK/MODE/TOPIC
-
-		// INVITE MANAGEMENT
+	// OPERATOR MANAGEMENT
+	void		addOperator(Client* client); // -> Cmd MODE #general +o Alice
+	void		removeOperator(Client* client); // -> Cmd MODE #general -o Alice
+	bool		isOperator(Client* client) const; // Verifie si un client peut KICK/MODE/TOPIC
+	void		promoteFirstMemberIfNeeded(); // -> Promouvoir automatiquement si plus d'ops		// INVITE MANAGEMENT
 		void		addInvite(Client* client); // -> Ajoute une invitation
 		void		removeInvite(Client* client); // -> Remove une invitation
 		bool		isInvited(Client* client) const; // Invite ou pas 

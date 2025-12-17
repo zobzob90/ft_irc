@@ -97,15 +97,17 @@ void	Server::removeClient(int fd)
         std::string nickname = client->getNickname();
         
         // Message QUIT conforme IRC
-        std::string quitMsg = ":" + nickname + " QUIT :Client disconnected\r\n";
+        std::string quitMsg = ":" + nickname + " QUIT :Client disconnected";
         
-        // Notifier les channels où le client était présent
+        // Notifier les channels où le client était présent (sauf le client lui-même)
         std::vector<Channel*> clientChannels = getClientChannels(client);
         for (size_t i = 0; i < clientChannels.size(); i++)
         {
-            clientChannels[i]->broadcast(quitMsg, NULL);
-            clientChannels[i]->removeMember(client);
+            clientChannels[i]->broadcast(quitMsg, client);  // Exclure le client qui part
         }
+        
+        // Retirer le client de tous les channels (et supprimer les channels vides)
+        removeClientFromAllChannels(client);
         
         std::cout << "Client disconnected: " << nickname << " (fd=" << fd << ")" << std::endl;
         

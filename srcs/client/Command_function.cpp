@@ -41,6 +41,37 @@ void Command::executeNick()
 		sendError(431, ":No Nickname Given");
 		return ;
 	}
+	
+	// Vérifier la longueur (RFC 2812 suggère max 9, mais nous acceptons 30)
+	if (newNickname.length() > 30)
+	{
+		sendError(432, newNickname + " :Erroneous nickname (too long)");
+		return;
+	}
+	
+	// Vérifier que le premier caractère n'est pas un chiffre
+	if (newNickname[0] >= '0' && newNickname[0] <= '9')
+	{
+		sendError(432, newNickname + " :Erroneous nickname (cannot start with digit)");
+		return;
+	}
+	
+	// Vérifier les caractères invalides
+	for (size_t i = 0; i < newNickname.length(); i++)
+	{
+		char c = newNickname[i];
+		bool isLetter = (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z');
+		bool isDigit = (c >= '0' && c <= '9');
+		bool isSpecial = (c == '[' || c == ']' || c == '\\' || c == '`' || 
+		                  c == '_' || c == '^' || c == '{' || c == '|' || c == '}' || c == '-');
+		
+		if (!isLetter && !isDigit && !isSpecial)
+		{
+			sendError(432, newNickname + " :Erroneous nickname (invalid characters)");
+			return;
+		}
+	}
+	
 	// Gestion doublon de Nickname
 	std::map<int, Client*>& clients = _server->getClients();
 	for (std::map<int, Client *>::iterator it = clients.begin(); it != clients.end(); ++it)
@@ -100,10 +131,17 @@ void	Command::executeJoin()
 		sendError(403, channelName + " :No such channel");
 		return ;
 	}
+	
 	// Recuperer ou creer le channel
 	Channel *channel = _server->getChannel(channelName);
 	if (!channel)
+	{
 		channel = _server->createChannel(channelName, _client);
+		// createChannel peut retourner NULL si le nom est invalide ou limite atteinte
+		if (!channel)
+			return; // L'erreur a déjà été envoyée par createChannel
+	}
+	
 	// Verification d'accès
 	if (channel->isInviteOnly() && !channel->isInvited(_client))
 	{

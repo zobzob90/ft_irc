@@ -29,6 +29,10 @@ void	signalHandler(int signum)
 	}
 	else if (signum == SIGTSTP)
 		std::cout << "\n\033[1;31m❌ SIGTSTP (Ctrl+Z) is disabled for this server.\033[0m" << std::endl;
+	else if (signum == SIGPIPE)
+	{
+		return;
+	}
 }
 
 void	printTitle(int port, const std::string &pass)
@@ -83,6 +87,7 @@ int main(int ac, char *av[])
 		signal(SIGINT, signalHandler);
 		signal(SIGQUIT, signalHandler);
 		signal(SIGTSTP, signalHandler);
+		signal(SIGPIPE, signalHandler);  // Ignorer SIGPIPE pour éviter crash sur send()
 		server.run();
 	}
 	catch (const std::exception& e)
