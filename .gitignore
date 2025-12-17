@@ -23,7 +23,7 @@ objs/
 # DOSSIER TEST - INTÉGRALITÉ DU DOSSIER
 # ============================================
 # Ignorer tout le dossier test
-test/
+test/*
 
 # ============================================
 # FICHIERS SYSTÈME
