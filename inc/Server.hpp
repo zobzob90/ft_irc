@@ -6,7 +6,7 @@
 /*   By: ertrigna <ertrigna@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/03 17:52:20 by ertrigna          #+#    #+#             */
-/*   Updated: 2025/12/17 16:41:06 by ertrigna         ###   ########.fr       */
+/*   Updated: 2025/12/17 16:59:16 by ertrigna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,27 +59,32 @@ class Server
 		std::string							getPassword() const {return _password; }
 		std::map<int, Client*>&				getClients() {return _clients; }
 		std::map<std::string, Channel*>&	getChannels() {return _channels; }
-		std::vector<Channel*>		getClientChannels(Client* client);
+		std::vector<Channel*>				getClientChannels(Client* client);
 		Bot*								getBot() const {return _bot; }
 
 		//CHANNEL MANAGEMENTS : Creer / Gerer / Detruire
-		Channel*	getChannel(const std::string& name);
-		Channel*	createChannel(const std::string& name, Client *creator);
-		void		destroyChannel(const std::string& name);
+		Channel*							getChannel(const std::string& name);
+		Channel*							createChannel(const std::string& name, Client *creator);
+		void								destroyChannel(const std::string& name);
 		
 		//CHANNEL UTILITIES
-		void		broadcastToUserChannels(Client* clients, const std::string msg);
-		void		removeClientFromAllChannels(Client* client);
-		void		markForDisconnect(Client* client);
+		void								removeClientFromAllChannels(Client* client);
+		void								markForDisconnect(Client* client);
 
-	//SERVER MANAGEMENTS
-	void		closeServer(); // fonction pour fermer le server
-	void		sendToUser(Client* user, const std::string& msg);
-	void		flushClientOutput(int fd); // envoyer les donnees en attente
-	void		handleNewConnection(); // gerer la connection
-	void		handleClientMessage(int fd); // gerer les messages
-	void		removeClient(int fd); // enlever un client
-	void		run(); // fonction principale pour runner le server
+		//SERVER MANAGEMENTS
+		void								closeServer(); // fonction pour fermer le server
+		void								sendToUser(Client* user, const std::string& msg);
+		void								flushClientOutput(int fd); // envoyer les donnees en attente
+		void								handleNewConnection(); // gerer la connection
+		void								handleClientMessage(int fd); // gerer les messages
+		void								removeClient(int fd); // enlever un client
+		void								run(); // fonction principale pour runner le server
+
+		// SERVER UTILS
+        std::string    						cleanMessage(const std::string& msg);
+        void       							removePollFd(int fd);
+        Client*								getClientByFd(int fd);
+        void								addPollFd(int fd, short events);
 } ;
 
 #endif
