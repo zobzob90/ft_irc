@@ -6,7 +6,7 @@
 /*   By: ertrigna <ertrigna@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/14 16:41:24 by ertrigna          #+#    #+#             */
-/*   Updated: 2025/12/16 13:25:44 by ertrigna         ###   ########.fr       */
+/*   Updated: 2025/12/18 17:11:51 by ertrigna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -91,8 +91,14 @@ void Command::execute()
 		executeMode();
 	else if (_command == "KICK")
 		executeKick();
+
+	// Cmd Utilitaire
 	else if (_command == "QUIT")
 		executeQuit();
+	else if (_command == "LIST")
+		executeList();
+	else if (_command == "WHO")
+		executeWho();
 	else
 		sendError(421, _command + " :Unknown command");
 }

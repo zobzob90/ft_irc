@@ -6,7 +6,7 @@
 /*   By: ertrigna <ertrigna@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/21 19:48:34 by ertrigna          #+#    #+#             */
-/*   Updated: 2025/12/18 13:57:07 by ertrigna         ###   ########.fr       */
+/*   Updated: 2025/12/18 17:16:08 by ertrigna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -123,18 +123,13 @@ void	Command::executeJoin()
 		sendError(403, channelName + " :No such channel");
 		return ;
 	}
-	
-	// Recuperer ou creer le channel
 	Channel *channel = _server->getChannel(channelName);
 	if (!channel)
 	{
 		channel = _server->createChannel(channelName, _client);
-		// createChannel peut retourner NULL si le nom est invalide ou limite atteinte
 		if (!channel)
 			return; // L'erreur a déjà été envoyée par createChannel
 	}
-	
-	// Verification d'accès
 	if (channel->isInviteOnly() && !channel->isInvited(_client))
 	{
 		sendError(473, channelName + " :Cannot join channel (+i)");
@@ -150,25 +145,17 @@ void	Command::executeJoin()
 		sendError(471, channelName + " :Cannot join channel (+l)");
 		return;
 	}
-	// Ajouter le client au channel
 	channel->addMember(_client);
-	
-	// Si le client avait une invitation, la retirer (elle a été utilisée)
 	if (channel->isInvited(_client))
 		channel->removeInvite(_client);
-	
-	// Envoyer la confirmation à tous (y compris le client)
 	std::string joinMsg = ":" + _client->getPrefix() + " JOIN " + channelName;
-	channel->broadcast(joinMsg, NULL); //NULL = envoyer à tous
+	channel->broadcast(joinMsg, NULL);
 	if(_server->getBot())
 		_server->getBot()->onUserJoin(channel, _client);
-	//Envoyer le topic s'il existe
 	if (!channel->getTopic().empty())
 		sendReply(332, channelName + " :" + channel->getTopic());
-	// Envoyer la liste des membres
 	sendReply(353, "= " + channelName + " :" + channel->getMemberList());
 	sendReply(366, channelName + " :End of /NAMES list");
-
 }
 
 void	Command::executePrivmsg()
@@ -370,5 +357,49 @@ void	Command::executeMode()
 	{
 		std::string modeMsg = ":" + _client->getPrefix() + " MODE " + channelName + " " + applied + appliedParams;
 		channel->broadcast(modeMsg, NULL);
+	}
+}
+
+void	Command::executeWho()
+{
+	std::map<int, Client*>& clients = _server->getClients();
+	sendReply(322, ":=== Connected Users ===");
+	int count = 0;
+	for (std::map<int, Client*>::iterator it =  clients.begin(); it != clients.end(); ++it)
+	{
+		Client* user = it->second;
+		if (user->isRegistered())
+		{
+			count++;
+			std::ostringstream oss;
+			oss << count << ". " << user->getNickname() << " (" << user->getUsername() << "@" << user->getHostname() <<")";
+			sendReply(322, ":" + oss.str());
+		}
+	}
+	std::ostringstream total;
+	total << ":Total: " << count << " user(s) online";
+	sendReply(315, total.str());
+}
+
+void	Command::executeList()
+{
+	sendReply(321, ":=== Available Channels ===");
+	std::map<std::string, Channel*>& channels = _server->getChannels();
+	if (channels.empty())
+		sendReply(322, ":No channels available for the moment");
+	else
+	{
+		int count = 0;
+		for (std::map<std::string, Channel*>::iterator it = channels.begin(); it != channels.end(); ++it)
+		{
+			Channel* chan = it->second;
+			count++;
+			std::ostringstream oss;
+			oss << count << ". " << chan->getName() << "[ " << chan->getMembersCount() << " user(s)]";
+			std::string topic = chan->getTopic();
+			if (!topic.empty())
+				oss << " - " << topic;
+			sendReply(322, ":" + oss.str());
+		}
 	}
 }

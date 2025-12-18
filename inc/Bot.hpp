@@ -6,7 +6,7 @@
 /*   By: ertrigna <ertrigna@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/09 13:48:15 by ertrigna          #+#    #+#             */
-/*   Updated: 2025/12/09 16:34:43 by ertrigna         ###   ########.fr       */
+/*   Updated: 2025/12/18 16:09:26 by ertrigna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,6 +43,9 @@ class Bot
 			_bannedWords.push_back("connard");
 			_bannedWords.push_back("con");
 			_bannedWords.push_back("fdp");
+			_bannedWords.push_back("fils de pute");
+			_bannedWords.push_back("CON");
+			_bannedWords.push_back("merde");
 			_bannedWords.push_back("PTT");
 		}
 		~Bot() 
