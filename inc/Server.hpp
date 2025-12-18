@@ -6,7 +6,7 @@
 /*   By: ertrigna <ertrigna@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/03 17:52:20 by ertrigna          #+#    #+#             */
-/*   Updated: 2025/12/17 16:59:16 by ertrigna         ###   ########.fr       */
+/*   Updated: 2025/12/18 14:20:31 by ertrigna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,10 +81,10 @@ class Server
 		void								run(); // fonction principale pour runner le server
 
 		// SERVER UTILS
-        std::string    						cleanMessage(const std::string& msg);
-        void       							removePollFd(int fd);
-        Client*								getClientByFd(int fd);
-        void								addPollFd(int fd, short events);
+		std::string							cleanMessage(const std::string& msg);
+		void								removePollFd(int fd);
+		Client*								getClientByFd(int fd);
+		void								addPollFd(int fd, short events);
 } ;
 
 #endif
