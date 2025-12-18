@@ -6,7 +6,7 @@
 #    By: ertrigna <ertrigna@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/12/15 15:28:52 by ertrigna          #+#    #+#              #
-#    Updated: 2025/12/17 15:27:02 by ertrigna         ###   ########.fr        #
+#    Updated: 2025/12/18 17:27:38 by ertrigna         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -24,7 +24,9 @@ SRCS		= $(SRCS_DIR)/main.cpp \
               $(SRCS_DIR)/channel/Channel_Management.cpp \
               $(SRCS_DIR)/client/Client.cpp \
               $(SRCS_DIR)/client/Command_parsing.cpp \
-              $(SRCS_DIR)/client/Command_function.cpp \
+              $(SRCS_DIR)/client/Command_auth.cpp \
+			  $(SRCS_DIR)/client/Command_channel.cpp \
+			  $(SRCS_DIR)/client/Command_info.cpp \
               $(SRCS_DIR)/client/Command_utils.cpp \
               $(SRCS_DIR)/reseaux/Server_Management.cpp \
               $(SRCS_DIR)/reseaux/Socket.cpp \
