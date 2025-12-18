@@ -6,7 +6,7 @@
 /*   By: ertrigna <ertrigna@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/03 17:52:17 by ertrigna          #+#    #+#             */
-/*   Updated: 2025/12/17 16:33:34 by ertrigna         ###   ########.fr       */
+/*   Updated: 2025/12/18 13:41:14 by ertrigna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,7 @@ void	Server::handleNewConnection()
 
 	if (fcntl(clientFd, F_SETFL, O_NONBLOCK) < 0)
 	{
-		std::cerr << "fcntl() failed on client socket" << std::endl;
+		std::cerr << "❌ fcntl() failed on client socket" << std::endl;
 		close(clientFd);
 		return;
 	}
@@ -80,7 +80,6 @@ void	Server::flushClientOutput(int fd)
 		return;
 	
 	ssize_t sent = send(fd, data.c_str(), data.size(), 0);
-	
 	if (sent > 0)
 	{
 		// Effacer les données envoyées du buffer
@@ -100,12 +99,7 @@ void	Server::flushClientOutput(int fd)
 		}
 	}
 	else if (sent < 0)
-	{
-		// Si send() échoue alors que poll() a indiqué POLLOUT,
-		// c'est une vraie erreur (connexion cassée, etc.)
 		removeClient(fd);
-	}
-	// Si sent == 0, on ne fait rien (cas rare mais possible)
 }
 
 std::vector<Channel*> Server::getClientChannels(Client* client)
@@ -242,7 +236,6 @@ void	Server::run()
 				else
 					handleClientMessage(currentFd);
 			}
-			
 			if (currentRevents & POLLOUT)
 			{
 				flushClientOutput(currentFd);

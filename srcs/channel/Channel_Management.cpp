@@ -6,7 +6,7 @@
 /*   By: ertrigna <ertrigna@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/02 16:02:08 by ertrigna          #+#    #+#             */
-/*   Updated: 2025/12/05 13:56:52 by ertrigna         ###   ########.fr       */
+/*   Updated: 2025/12/18 14:00:44 by ertrigna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,41 +17,25 @@
 // Fonction pour valider le nom d'un channel selon RFC IRC
 static bool isValidChannelName(const std::string& name)
 {
-	// Doit commencer par #
 	if (name.empty() || name[0] != '#')
-		return false;
-	
-	// Minimum 2 caractères (#a), maximum 50
+		return (false);
 	if (name.length() < 2 || name.length() > 50)
-		return false;
-	
-	// Ne peut pas être juste '#'
+		return (false);
 	if (name == "#")
-		return false;
-	
-	// Rejeter ## au début (channels comme ##test sont invalides)
+		return (false);
 	if (name.length() >= 2 && name[1] == '#')
-		return false;
-	
-	// Vérifier explicitement qu'il n'y a pas d'espaces (car le parsing peut les ignorer)
+		return (false);
 	if (name.find(' ') != std::string::npos)
-		return false;
-	
-	// Vérifier les caractères invalides (selon RFC 2812)
+		return (false);
 	for (size_t i = 1; i < name.length(); i++)
 	{
 		char c = name[i];
-		// Interdire: espace, virgule, control chars, bell (0x07)
 		if (c == ' ' || c == ',' || c == 7 || c == '\r' || c == '\n' || c < 32)
-			return false;
-		
-		// Interdire certains caractères spéciaux problématiques
-		// @ et ! sont utilisés dans les préfixes IRC, : pour les paramètres
+			return (false);
 		if (c == '@' || c == '!')
-			return false;
+			return (false);
 	}
-	
-	return true;
+	return (true);
 }
 
 Channel* Server::getChannel(const std::string& name)
@@ -64,30 +48,23 @@ Channel* Server::getChannel(const std::string& name)
 
 Channel* Server::createChannel(const std::string& name, Client* creator)
 {
-	// Vérifier si le nom du channel est valide
 	if (!isValidChannelName(name))
 	{
 		std::string errorMsg = ":server 403 " + creator->getNickname() + " " + name + " :Invalid channel name";
 		sendToUser(creator, errorMsg);
 		return NULL;
 	}
-	
-	// Vérifier la limite de channels
 	if (_channels.size() >= MAX_CHANNELS)
 	{
 		std::string errorMsg = ":server 405 " + creator->getNickname() + " " + name + " :You have joined too many channels";
 		sendToUser(creator, errorMsg);
 		return NULL;
 	}
-	
 	Channel* newChannel = new Channel(name, this);  // Passer le pointeur du serveur
-
 	newChannel->addMember(creator);
 	newChannel->addOperator(creator);
 	_channels[name] = newChannel;
-
 	std::cout << "📢 New channel is here : " << name << " by " << creator->getNickname() << std::endl; 
-	
 	return (newChannel);
 }
 
@@ -113,18 +90,16 @@ void Server::removeClientFromAllChannels(Client* client)
 		if (channel->isMember(client))
 		{
 			channel->removeMember(client);
-
-			// Si le channel est vide, on le supprime
 			if (channel->getMembersCount() == 0)
 			{
 				delete it->second;
-				_channels.erase(it++); // Erase l'ancien it, puis avance
+				_channels.erase(it++);
 			} 
 			else 
-				++it; // Avancer normalement si pas de suppression
+				++it;
 		} 
 		else
-			++it; // Avancer si le client n'est pas membre
+			++it;
 	}
 }
 

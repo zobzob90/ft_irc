@@ -6,7 +6,7 @@
 /*   By: ertrigna <ertrigna@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/21 19:48:34 by ertrigna          #+#    #+#             */
-/*   Updated: 2025/12/09 19:51:16 by ertrigna         ###   ########.fr       */
+/*   Updated: 2025/12/18 13:57:07 by ertrigna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,22 +41,16 @@ void Command::executeNick()
 		sendError(431, ":No Nickname Given");
 		return ;
 	}
-	
-	// Vérifier la longueur (RFC 2812 suggère max 9, mais nous acceptons 30)
 	if (newNickname.length() > 30)
 	{
 		sendError(432, newNickname + " :Erroneous nickname (too long)");
 		return;
 	}
-	
-	// Vérifier que le premier caractère n'est pas un chiffre
 	if (newNickname[0] >= '0' && newNickname[0] <= '9')
 	{
 		sendError(432, newNickname + " :Erroneous nickname (cannot start with digit)");
 		return;
 	}
-	
-	// Vérifier les caractères invalides
 	for (size_t i = 0; i < newNickname.length(); i++)
 	{
 		char c = newNickname[i];
@@ -71,8 +65,6 @@ void Command::executeNick()
 			return;
 		}
 	}
-	
-	// Gestion doublon de Nickname
 	std::map<int, Client*>& clients = _server->getClients();
 	for (std::map<int, Client *>::iterator it = clients.begin(); it != clients.end(); ++it)
 	{
@@ -275,65 +267,42 @@ void	Command::executeKick()
 
 void	Command::executeInvite()
 {
-	// Vérifier les paramètres : INVITE <nickname> <channel>
 	if (!checkParamSize(2, "INVITE"))
 		return;
-	
 	std::string targetNick = _params[0];
 	std::string channelName = _params[1];
-
-	// Vérifier que le channel existe et commence par #
 	Channel* channel = getChannelOrError(channelName);
 	if (!channel)
 		return;
-
-	// Vérifier que l'inviteur est membre du channel
 	if (!checkChannelMembership(channel, channelName))
 		return;
-
-	// Si le channel est en mode +i (invite-only), seuls les OPs peuvent inviter
 	if (channel->isInviteOnly() && !checkChannelOperator(channel, channelName))
 		return;
-
-	// Trouver l'utilisateur cible
 	Client* target = findClientByNick(targetNick);
 	if (!target)
 		return;
-
-	// Vérifier que la cible n'est pas déjà sur le channel
 	if (channel->isMember(target)){
 		sendError(443, targetNick + " " + channelName + " :is already on channel");
 		return;
 	}
-
-	// Ajouter l'invitation
 	channel->addInvite(target);
-
-	// Envoyer la notification à la cible
 	std::string inviteMsg = ":" + _client->getPrefix() + " INVITE " + targetNick + " " + channelName;
 	_server->sendToUser(target, inviteMsg);
-
-	// Confirmer à l'inviteur (code 341)
 	sendReply(341, targetNick + " " + channelName);
 }
 
-void		Command::executeTopic(){
-	// Vérifier qu'on a au moins le nom du channel
+void		Command::executeTopic()
+{
 	if (!checkParamSize(1, "TOPIC"))
 		return;
 	std::string channelName = _params[0];
-
-	// Vérifier que le channel existe et commence par #
 	Channel* channel = getChannelOrError(channelName);
 	if (!channel)
 		return;
-
-	// Vérifier que le client est membre du channel
 	if (!checkChannelMembership(channel, channelName))
 		return;
-	
-	// CAS 1 : Afficher le tropic actuel (pas de 2ème paramètre)
-	if (_params.size() == 1){
+	if (_params.size() == 1)
+	{
 		std::string currentTopic = channel->getTopic();
 
 		if (currentTopic.empty()){
@@ -343,18 +312,10 @@ void		Command::executeTopic(){
 		}
 		return;
 	}
-
-	// CAS 2 : Modifier le topic (_params.size() >= 2)
 	std::string newTopic = _params[1];
-
-	// Si le channel a le mode +t (topicRestrict), seuls les OPs peuvent changer
 	if (channel->isTopicRestricted() && !checkChannelOperator(channel, channelName))
 		return;
-	
-	// Changer le topic
 	channel->setTopic(newTopic);
-
-	// Notifier tous les membres du channel du changement de topic
 	std::string topicMsg = ":" + _client->getPrefix() + " TOPIC " + channelName + " :" + newTopic;
 	channel->broadcast(topicMsg, NULL);
 }
@@ -368,35 +329,25 @@ void	Command::executeMode()
 	Channel* channel = getChannelOrError(channelName);
 	if (!channel || !checkChannelMembership(channel, channelName))
 		return;
-
-	// Afficher les modes actuels
 	if (_params.size() == 1)
 	{
 		displayChannelModes(channel, channelName);
 		return;
 	}
-
-	// Modifier les modes (OP uniquement)
 	if (!checkChannelOperator(channel, channelName))
 		return;
-
 	std::string modeStr = _params[1];
 	size_t paramIdx = 2;
 	bool adding = true;
 	std::string applied = "";
 	std::string appliedParams = "";
-
 	for (size_t i = 0; i < modeStr.length(); ++i)
 	{
 		char c = modeStr[i];
 		
-		// Gérer les modificateurs +/-
 		if (c == '+') { adding = true; continue; }
 		if (c == '-') { adding = false; continue; }
-
-		// Appliquer le mode correspondant
 		bool success = false;
-		
 		if (c == 'i')
 			success = applyModeI(channel, adding, applied);
 		else if (c == 't')
@@ -412,20 +363,12 @@ void	Command::executeMode()
 			sendError(472, std::string(1, c) + " :is unknown mode char to me");
 			return;
 		}
-		
-		// Si une erreur s'est produite, arrêter
 		if (!success)
 			return;
 	}
-
-	// Broadcast des changements
 	if (!applied.empty())
 	{
 		std::string modeMsg = ":" + _client->getPrefix() + " MODE " + channelName + " " + applied + appliedParams;
 		channel->broadcast(modeMsg, NULL);
 	}
 }
-
-//je suis un commmentaire
-
-

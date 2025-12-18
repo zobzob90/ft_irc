@@ -6,7 +6,7 @@
 /*   By: ertrigna <ertrigna@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/01 17:30:55 by ertrigna          #+#    #+#             */
-/*   Updated: 2025/12/01 19:11:09 by ertrigna         ###   ########.fr       */
+/*   Updated: 2025/12/18 14:01:06 by ertrigna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,13 +55,10 @@ bool Channel::isOperator(Client* client) const
 
 void Channel::promoteFirstMemberIfNeeded()
 {
-	// Si il n'y a plus d'opérateurs mais qu'il reste des membres
 	if (_operators.empty() && !_members.empty())
 	{
 		Client* newOp = _members[0];
 		addOperator(newOp);
-		
-		// Envoyer un message au canal pour informer de la promotion automatique
 		std::string promotionMsg = ":Server MODE " + _name + " +o " + newOp->getNickname();
 		broadcast(promotionMsg, NULL);
 	}
@@ -89,7 +86,6 @@ void Channel::broadcast(const std::string& message, Client *exclude)
 {
 	if (!_server)
 	{
-		// Fallback si pas de serveur (ne devrait pas arriver)
 		for (size_t i = 0; i < _members.size(); i++)
 		{
 			if (_members[i] != exclude)
@@ -100,8 +96,6 @@ void Channel::broadcast(const std::string& message, Client *exclude)
 		}
 		return;
 	}
-	
-	// Utiliser le système de buffering du serveur
 	for (size_t i = 0; i < _members.size(); i++)
 	{
 		if (_members[i] != exclude)
