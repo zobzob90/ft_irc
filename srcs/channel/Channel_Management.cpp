@@ -6,7 +6,7 @@
 /*   By: ertrigna <ertrigna@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/02 16:02:08 by ertrigna          #+#    #+#             */
-/*   Updated: 2025/12/18 14:00:44 by ertrigna         ###   ########.fr       */
+/*   Updated: 2025/12/18 14:15:01 by ertrigna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -105,7 +105,7 @@ void Server::removeClientFromAllChannels(Client* client)
 
 void Server::markForDisconnect(Client* client)
 {
-	std::string errorMsg = "ERROR :Closing connection";
+	std::string errorMsg = "❌ ERROR :Closing connection";
 	sendToUser(client, errorMsg);
 	removeClient(client->getFd());
 }

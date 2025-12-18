@@ -6,7 +6,7 @@
 /*   By: ertrigna <ertrigna@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/01 17:30:55 by ertrigna          #+#    #+#             */
-/*   Updated: 2025/12/18 14:01:06 by ertrigna         ###   ########.fr       */
+/*   Updated: 2025/12/18 14:15:23 by ertrigna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,9 +24,7 @@ void Channel::removeMember(Client* client)
 	std::vector<Client *>::iterator it = std::find(_members.begin(), _members.end(), client);
 	if (it != _members.end())
 		_members.erase(it);
-	// On retire aussi des operateurs si c'etait un OP
 	removeOperator(client);
-	// Si plus d'operateurs, promouvoir automatiquement le premier membre
 	promoteFirstMemberIfNeeded();
 }
 
