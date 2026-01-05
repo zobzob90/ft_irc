@@ -6,7 +6,7 @@
 /*   By: ertrigna <ertrigna@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/03 17:52:17 by ertrigna          #+#    #+#             */
-/*   Updated: 2025/12/18 14:14:31 by ertrigna         ###   ########.fr       */
+/*   Updated: 2026/01/05 15:29:03 by ertrigna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,12 +19,10 @@ extern volatile sig_atomic_t g_stop;
 void	Server::handleNewConnection()
 {
 	sockaddr_in clientAddr;
-	
 	socklen_t len = sizeof(clientAddr);
 	int	clientFd = accept(_serverSocket, (sockaddr *)&clientAddr, &len);
 	if (clientFd < 0)
 		return ;
-
 	if (fcntl(clientFd, F_SETFL, O_NONBLOCK) < 0)
 	{
 		std::cerr << "❌ fcntl() failed on client socket" << std::endl;
@@ -36,9 +34,7 @@ void	Server::handleNewConnection()
 	inet_ntop(AF_INET, &clientAddr.sin_addr, ip, INET_ADDRSTRLEN);
 	newClient->setHostname(ip);
 	_clients[clientFd] = newClient;
-
 	addPollFd(clientFd, POLLIN);
-	
 	std::cout << "New client connected (fd=" << clientFd << ")" << std::endl;
 }
 
@@ -49,12 +45,8 @@ void	Server::sendToUser(Client* user, const std::string& msg)
 	int fd = user->getFd();
 	if (fd < 0)
 		return ;
-	
-	// Ajouter \r\n au message et le mettre dans le buffer de sortie
 	std::string formattedMsg = msg + "\r\n";
 	user->appendOutputBuffer(formattedMsg);
-	
-	// Activer POLLOUT pour ce client
 	for (size_t i = 0; i < _pollFds.size(); i++)
 	{
 		if (_pollFds[i].fd == fd)
@@ -84,7 +76,6 @@ void	Server::flushClientOutput(int fd)
 	{
 		// Effacer les données envoyées du buffer
 		client->clearOutputBuffer(sent);
-		
 		// Si tout a été envoyé, désactiver POLLOUT
 		if (!client->hasOutputPending())
 		{
@@ -124,7 +115,6 @@ void	Server::removeClient(int fd)
 	{
 		std::string nickname = client->getNickname();
 		std::string quitMsg = ":" + nickname + " QUIT :Client disconnected";
-		
 		std::vector<Channel*> clientChannels = getClientChannels(client);
 		for (size_t i = 0; i < clientChannels.size(); i++)
 			clientChannels[i]->broadcast(quitMsg, client);  // Exclure le client qui part
@@ -159,17 +149,14 @@ void	Server::handleClientMessage(int fd)
 		std::string message = client->extractMessage();
 		if (message.empty())
 			continue;
-			
 		std::string cleanMsg = cleanMessage(message);
 		if (cleanMsg.empty())
 			continue;
 		std::cout << "[" << client->getNickname() << "] " << cleanMsg << std::endl;
 		Command cmd(this, client, cleanMsg);
 		cmd.execute();
-
 		if (!getClientByFd(fd))
 			return;
-
 		if (client->isMarkedForDisconnect())
 		{
 			std::cout << "Client kicked/removed: " << client->getNickname() << " (fd=" << fd << ")" << std::endl;

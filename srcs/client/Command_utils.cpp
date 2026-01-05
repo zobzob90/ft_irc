@@ -6,7 +6,7 @@
 /*   By: ertrigna <ertrigna@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/21 20:40:50 by ertrigna          #+#    #+#             */
-/*   Updated: 2025/12/17 14:30:22 by ertrigna         ###   ########.fr       */
+/*   Updated: 2026/01/05 13:41:22 by ertrigna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -111,7 +111,7 @@ void	Command::sendReply(int code, const std::string& message)
 {
 	std::ostringstream oss;
 
-	oss << ":" << "\033[1;31m[IRC]\033[0m" << " ";
+	oss << ":server ";
 	if (code < 10)
 		oss << "00" << code;
 	else if (code < 100)
@@ -219,15 +219,15 @@ bool Command::applyModeO(Channel* channel, bool adding, size_t& paramIdx, const 
 	if (paramIdx >= _params.size())
 	{
 		sendError(461, "MODE +o/-o :Not enough parameters");
-		return false;
+		return (false);
 	}
 	Client* target = findClientByNick(_params[paramIdx]);
 	if (!target)
-		return false;
+		return (false);
 	if (!channel->isMember(target))
 	{
 		sendError(441, _params[paramIdx] + " " + channelName + " :They aren't on that channel");
-		return false;
+		return (false);
 	}
 	if (adding)
 		channel->addOperator(target);
@@ -236,5 +236,5 @@ bool Command::applyModeO(Channel* channel, bool adding, size_t& paramIdx, const 
 	applied += (adding ? "+" : "-");
 	applied += "o";
 	appliedParams += " " + _params[paramIdx++];
-	return true;
+	return (true);
 }
