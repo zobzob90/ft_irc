@@ -6,7 +6,7 @@
 /*   By: ertrigna <ertrigna@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/03 17:52:17 by ertrigna          #+#    #+#             */
-/*   Updated: 2026/01/05 15:29:03 by ertrigna         ###   ########.fr       */
+/*   Updated: 2026/01/05 16:18:08 by ertrigna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,13 +16,18 @@
 
 extern volatile sig_atomic_t g_stop;
 
+// Accepte une nouvelle connexion cliente
+// Cree un fd client en mode non-bloquant et l'ajoute a POLL
 void	Server::handleNewConnection()
 {
 	sockaddr_in clientAddr;
 	socklen_t len = sizeof(clientAddr);
+	//Accepte le client et recupere le fd du nouveau client
 	int	clientFd = accept(_serverSocket, (sockaddr *)&clientAddr, &len);
 	if (clientFd < 0)
 		return ;
+
+	// Mode non bloquant pour eviter de bloquer le serveur
 	if (fcntl(clientFd, F_SETFL, O_NONBLOCK) < 0)
 	{
 		std::cerr << "❌ fcntl() failed on client socket" << std::endl;
@@ -38,6 +43,7 @@ void	Server::handleNewConnection()
 	std::cout << "New client connected (fd=" << clientFd << ")" << std::endl;
 }
 
+// Envoi un message serveur a l'user 
 void	Server::sendToUser(Client* user, const std::string& msg)
 {
 	if (!user)
