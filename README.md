@@ -38,6 +38,17 @@ Le protocole TCP permet de garantir que les messages qui arrivent sur le serveur
   - parsé selon le protocole IRC
   - puis exécuté
 
+## Fonction principale :
+
+- socket()  Création du socket serveur
+- bind()    Réservation du port
+- listen()  Prépare le serveur a recevoir des clients
+- accept()  Crée un nouveaux fd client
+- recv()    Recoit les donnees d'un socket - Lit les commandes des clients
+- send()    Envoie les donnees d'un socket - Envoie les réponses aux clients
+- Poll()    Surveille plusieurs FD pour détecter des évenement i/o
+- fnctl()   Active le mode non bloquant 
+
 ## 🧱 Architecture
 ```
 ├── inc
