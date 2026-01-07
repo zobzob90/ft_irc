@@ -6,7 +6,7 @@
 /*   By: ertrigna <ertrigna@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/21 19:48:34 by ertrigna          #+#    #+#             */
-/*   Updated: 2025/12/18 17:26:42 by ertrigna         ###   ########.fr       */
+/*   Updated: 2026/01/07 14:12:23 by ertrigna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,6 +34,11 @@ void Command::executeNick()
 {
 	if (!checkParamSize(1, "NICK"))
 		return ;
+	if (!_client->isAuthenticated())
+	{
+		sendError(464, "Password required");
+		return ;
+	}
 	std::string newNickname = _params[0];
 	
 	if (newNickname.empty())
