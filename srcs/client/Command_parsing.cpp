@@ -6,7 +6,7 @@
 /*   By: ertrigna <ertrigna@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/14 16:41:24 by ertrigna          #+#    #+#             */
-/*   Updated: 2025/12/18 17:11:51 by ertrigna         ###   ########.fr       */
+/*   Updated: 2026/01/07 14:34:20 by ertrigna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,16 +42,6 @@ void Command::parse(const std::string& message)
 			break;
 		}
 		_params.push_back(word);
-	}
-
-	if (_command == "PRIVMSG")
-	{
-		if(_params.size() != 2 || !hasTrailing)
-		{
-			_params.clear();
-			_command = "";
-			return ;
-		}
 	}
 }
 
@@ -91,8 +81,6 @@ void Command::execute()
 		executeMode();
 	else if (_command == "KICK")
 		executeKick();
-
-	// Cmd Utilitaire
 	else if (_command == "QUIT")
 		executeQuit();
 	else if (_command == "LIST")

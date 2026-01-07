@@ -6,7 +6,7 @@
 /*   By: ertrigna <ertrigna@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/18 17:24:03 by ertrigna          #+#    #+#             */
-/*   Updated: 2025/12/18 17:26:01 by ertrigna         ###   ########.fr       */
+/*   Updated: 2026/01/07 14:29:42 by ertrigna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,10 +65,16 @@ void	Command::executeJoin()
 
 void	Command::executePrivmsg()
 {
-	if (!checkParamSize(1, "PRIVMSG"))
-		return;
-	if (!checkParamSize(2, "PRIVMSG"))
-		return;
+	if (_params.size() == 0)
+	{
+		sendError(411, ":No recipient given (PRIVMSG)");
+		return ;
+	}
+	else if (_params.size() == 1)
+	{
+		sendError(412, ":No text to send");
+		return;	
+	}
 	std::string target = _params[0];
 	std::string message = _params[1];
 
@@ -102,12 +108,20 @@ void	Command::executePart()
 	if (!checkParamSize(1, "PART"))
 		return;
 	std::string channelName = _params[0];
+	Channel* channel = _server->getChannel(channelName);
+	if (!channel)
+	{
+		sendError(403, channelName + " :No such channel");
+		return ;
+	}
+	if (!channel->isMember(_client))
+	{
+		sendError(442, channelName + " :You're not on that channel");
+		return ;
+	}
 	std::string partMessage = "Leaving";
-	if (_params.size() >= 2)
-		partMessage = _params[1];
-	Channel* channel = getChannelOrError(channelName);
-	if (!channel || !checkChannelMembership(channel, channelName))
-		return;
+		if (_params.size() >= 2)
+			partMessage = _params[1];
 	std::string partMsg = ":" + _client->getPrefix() + " PART " + channelName + " :" + partMessage;
 	channel->broadcast(partMsg, NULL);
 	removeFromChannelAndCleanup(channel, _client, channelName);

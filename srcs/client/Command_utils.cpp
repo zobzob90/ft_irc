@@ -6,7 +6,7 @@
 /*   By: ertrigna <ertrigna@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/21 20:40:50 by ertrigna          #+#    #+#             */
-/*   Updated: 2026/01/05 13:41:22 by ertrigna         ###   ########.fr       */
+/*   Updated: 2026/01/07 14:28:02 by ertrigna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,13 +80,6 @@ bool Command::checkParamSize(size_t required, const std::string& cmdName)
 			cmdName == "INVITE" || cmdName == "TOPIC" || cmdName == "MODE")
 		{
 			sendError(461, cmdName + " :Not enough parameters");
-		}
-		else if (cmdName == "PRIVMSG")
-		{
-			if (required == 1)
-				sendError(411, ":No recipient given (PRIVMSG)");
-			else
-				sendError(412, ":No text to send");
 		}
 		return (false);
     }
