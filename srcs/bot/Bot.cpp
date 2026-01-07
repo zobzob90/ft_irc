@@ -6,7 +6,7 @@
 /*   By: ertrigna <ertrigna@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/09 14:20:40 by ertrigna          #+#    #+#             */
-/*   Updated: 2025/12/18 14:05:58 by ertrigna         ###   ########.fr       */
+/*   Updated: 2026/01/07 13:51:01 by ertrigna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -107,6 +107,5 @@ void	Bot::dadJoke(Channel* channel)
 	));
 	int idx = rand() % jokes.size();
 	sendToChannel(channel, jokes[idx].first);
-	sleep(2);
 	sendToChannel(channel, jokes[idx].second);
 }

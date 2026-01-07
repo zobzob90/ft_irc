@@ -6,7 +6,7 @@
 /*   By: ertrigna <ertrigna@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/02 16:02:08 by ertrigna          #+#    #+#             */
-/*   Updated: 2025/12/18 14:15:01 by ertrigna         ###   ########.fr       */
+/*   Updated: 2026/01/07 13:10:53 by ertrigna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,7 +60,7 @@ Channel* Server::createChannel(const std::string& name, Client* creator)
 		sendToUser(creator, errorMsg);
 		return NULL;
 	}
-	Channel* newChannel = new Channel(name, this);  // Passer le pointeur du serveur
+	Channel* newChannel = new Channel(name, this);
 	newChannel->addMember(creator);
 	newChannel->addOperator(creator);
 	_channels[name] = newChannel;

@@ -6,7 +6,7 @@
 /*   By: ertrigna <ertrigna@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/03 17:52:17 by ertrigna          #+#    #+#             */
-/*   Updated: 2026/01/05 16:18:08 by ertrigna         ###   ########.fr       */
+/*   Updated: 2026/01/07 13:30:38 by ertrigna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,15 +68,12 @@ void	Server::flushClientOutput(int fd)
 	std::map<int, Client*>::iterator it = _clients.find(fd);
 	if (it == _clients.end())
 		return;
-	
 	Client* client = it->second;
 	if (!client || !client->hasOutputPending())
 		return;
-	
 	std::string data = client->getOutputBuffer();
 	if (data.empty())
 		return;
-	
 	ssize_t sent = send(fd, data.c_str(), data.size(), 0);
 	if (sent > 0)
 	{
